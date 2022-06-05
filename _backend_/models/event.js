@@ -15,7 +15,7 @@ const selectionSchema = new mongoose.Schema({
     selection_options: [String],
 });
 
-const assistantPermissions = Object.freeze({
+const eventPermissions = Object.freeze({
     // Checkbox: 'checkbox',
     // Radio: 'radio',
 });
@@ -28,7 +28,7 @@ const assistantSchema = new mongoose.Schema({
     },
     assistant_permission: {
         type: [String],
-        enum: Object.values(assistantPermissions),
+        enum: Object.values(eventPermissions),
     },
 });
 
@@ -43,10 +43,10 @@ const eventSchema = new mongoose.Schema({
             max: 100,
             type: String,
             required: [true, "Event name is required"],
-            unique: [true, "Event name must be unique"]
+            // unique: [true, "Event name must be unique"]
         },
         user_id: {
-            ref: 'user',
+            ref: 'User',
             required: [true, "User id is required"],
             type: mongoose.Schema.Types.ObjectId
         },
@@ -65,15 +65,6 @@ const eventSchema = new mongoose.Schema({
              *              "basketball"
              *          ]
              *      },
-             *      {
-             *          "name" : "Your gender?",
-             *          "type" : "radio",
-             *          "options" : [
-             *              "male",
-             *              "female",
-             *              "other"
-             *          ]
-             *      },
              * ]
              */
         },
@@ -90,18 +81,12 @@ const eventSchema = new mongoose.Schema({
              *              "see presence",
              *          ]
              *      },
-             *      {
-             *          "user_id" : "5446665465",
-             *          "permissions" : [
-             *              "see presence",
-             *              "make expire",
-             *          ]
-             *      },
              * ]
              */
         },
         expire: {
-            type: Date
+            type: Date,
+            min: Date.now()
         },
 
     },
@@ -117,8 +102,9 @@ const eventSchema = new mongoose.Schema({
 );
 
 Object.assign(eventSchema.statics, {
-    assistantPermissions,
+    eventPermissions,
     selectionTypes
 });
+
 //Compile the schema into models
 module.exports = mongoose.model('Event', eventSchema);

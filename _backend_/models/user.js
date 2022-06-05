@@ -1,5 +1,5 @@
-const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
+const {eventPermissions} = require("./event");
 
 const socialDetailsSchema = new mongoose.Schema({
 
@@ -12,28 +12,27 @@ const Users = Object.freeze({
     Admin: 'admin',
 });
 
-const userTypeSchema = new mongoose.Schema({
-
-    type: String,
-    enum: Object.values(Users),
-    required: [true, "User type is required"]
-});
-
 const Genders = Object.freeze({
     Male: 'male',
     Female: 'female',
     Other: 'other',
 });
 
-const genderSchema = new mongoose.Schema({
+const assistSchema = new mongoose.Schema({
 
-    type: String,
-    enum: Object.values(Genders),
+    event_id: {
+        ref: 'Event',
+        type: mongoose.Schema.Types.ObjectId,
+    },
+    assist_permission: {
+        type: [String],
+        enum: Object.values(eventPermissions),
+    },
 });
 
 const userSchema = new mongoose.Schema({
 
-        social_detail: {socialDetailsSchema},
+        social_detail: [socialDetailsSchema],
         email: {
             type: String,
             lowercase: true,
@@ -44,21 +43,33 @@ const userSchema = new mongoose.Schema({
             default: false
         },
         password: {
+            min: 6,
             type: String
         },
         name: {
+            min: 2,
+            max: 30,
             type: String,
             required: [true, "Name is required"]
         },
         dob: {
             type: Date
         },
-        gender: {genderSchema},
-        user_type: {userTypeSchema},
+        gender: {
+            type: String,
+            enum: Object.values(Genders),
+        },
+        user_type: {
+            default: Users.User,
+            type: String,
+            enum: Object.values(Users),
+            require: [true, "User type is required"]
+        },
         avtar: {
             type: String,
             default: "https://cdn.pixabay.com/photo/2013/07/13/12/07/avatar-159236_960_720.png",
         },
+        assist: [assistSchema],
         forgot_code: {
             type: Number,
             min: 100000,
@@ -74,12 +85,6 @@ const userSchema = new mongoose.Schema({
 
     },
     {
-        toJSON: {
-            virtuals: true,
-        },
-        toObject: {
-            virtuals: true,
-        },
         timestamps: true,
     }
 );
@@ -88,6 +93,7 @@ Object.assign(userSchema.statics, {
     Genders,
     Users
 });
+
 //Hash password
 // userSchema.pre('save', async function (next) {
 //     //hash password
