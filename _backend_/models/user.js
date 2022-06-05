@@ -3,8 +3,8 @@ const {eventPermissions} = require("./event");
 
 const socialDetailsSchema = new mongoose.Schema({
 
-    social_id: String,
-    social_name: String,
+    _id: String,
+    _name: String,
 });
 
 const Users = Object.freeze({
@@ -60,8 +60,8 @@ const userSchema = new mongoose.Schema({
             enum: Object.values(Genders),
         },
         user_type: {
-            default: Users.User,
             type: String,
+            default: Users.User,
             enum: Object.values(Users),
             require: [true, "User type is required"]
         },

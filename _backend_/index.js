@@ -11,6 +11,7 @@ dotenv.config();
 const authRoute = require("./routes/auth");
 const userRoute = require("./routes/user");
 const eventRoute = require("./routes/event");
+const presenceRoute = require("./routes/presence");
 
 //-----------------------middlewares-----------------------
 
@@ -22,6 +23,7 @@ app.use(morgan("common"));
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
 app.use("/api/event", eventRoute);
+app.use("/api/presence", presenceRoute);
 
 
 

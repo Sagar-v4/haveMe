@@ -2,22 +2,25 @@ const mongoose = require('mongoose');
 
 const selectedSchema = new mongoose.Schema({
 
-    selected_name: String,
-    selected_type: String,
-    selected_options: [String],
+    selection_id: {
+        ref: 'Selection',
+        require: [true, "Selection id is required"],
+        type: mongoose.Schema.Types.ObjectId
+    },
+    _options: [String],
 });
 
 const presenceSchema = new mongoose.Schema(
 
     {
         event_id: {
-            ref: 'event',
-            required: [true, "Event id is required"],
+            ref: 'Event',
+            require: [true, "Event id is required"],
             type: mongoose.Schema.Types.ObjectId
         },
         user_id: {
-            ref: 'user',
-            required: [true, "User id is required"],
+            ref: 'User',
+            require: [true, "User id is required"],
             type: mongoose.Schema.Types.ObjectId
         },
         selected: {

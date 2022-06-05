@@ -8,6 +8,7 @@ const socialDetailsSchema = new mongoose.Schema({
 });
 
 const Users = Object.freeze({
+
     User: 'user',
     Admin: 'admin',
 });
@@ -15,11 +16,11 @@ const Users = Object.freeze({
 const userTypeSchema = new mongoose.Schema({
 
     type: String,
-    enum: Object.values(Users),
-    required: [true, "User type is required"]
+    enum: Object.values(Users)
 });
 
 const Genders = Object.freeze({
+
     Male: 'male',
     Female: 'female',
     Other: 'other',
@@ -48,13 +49,16 @@ const userSchema = new mongoose.Schema({
         },
         name: {
             type: String,
-            required: [true, "Name is required"]
+            require: [true, "Name is required"]
         },
         dob: {
             type: Date
         },
         gender: {genderSchema},
-        user_type: {userTypeSchema},
+        user_type: {
+            type: userTypeSchema,
+            require: [true, "User type is required"]
+        },
         avtar: {
             type: String,
             default: "https://cdn.pixabay.com/photo/2013/07/13/12/07/avatar-159236_960_720.png",

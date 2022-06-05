@@ -7,12 +7,12 @@ const selectionTypes = Object.freeze({
 
 const selectionSchema = new mongoose.Schema({
 
-    selection_name: String,
-    selection_type: {
+    _name: String,
+    _type: {
         type: String,
         enum: Object.values(selectionTypes),
     },
-    selection_options: [String],
+    _options: [String],
 });
 
 const eventPermissions = Object.freeze({
@@ -22,11 +22,11 @@ const eventPermissions = Object.freeze({
 
 const assistantSchema = new mongoose.Schema({
 
-    assistant_id: {
+    _id: {
         ref: 'User',
         type: mongoose.Schema.Types.ObjectId,
     },
-    assistant_permission: {
+    _permission: {
         type: [String],
         enum: Object.values(eventPermissions),
     },
@@ -103,8 +103,10 @@ const eventSchema = new mongoose.Schema({
 
 Object.assign(eventSchema.statics, {
     eventPermissions,
-    selectionTypes
+    selectionTypes,
+    selectionSchema
 });
 
 //Compile the schema into models
 module.exports = mongoose.model('Event', eventSchema);
+// module.exports = mongoose.model('Selection', selectionSchema);
