@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const selectionTypes = Object.freeze({
     Checkbox: 'checkbox',
     Radio: 'radio',
+    Text: 'text',
 });
 
 const selectionSchema = new mongoose.Schema({
@@ -13,11 +14,22 @@ const selectionSchema = new mongoose.Schema({
         enum: Object.values(selectionTypes),
     },
     _options: [String],
+},{
+    timestamps: true,
 });
 
-const eventPermissions = Object.freeze({
-    // Checkbox: 'checkbox',
-    // Radio: 'radio',
+const assistantPermissions = Object.freeze({
+    Edit: 'edit',
+    Group: 'group',
+    QRCode: 'qrcode',
+    Assist: 'assist',
+    Presence: 'presence',
+    Selection: 'selection',
+});
+
+const eventModes = Object.freeze({
+    Public: 'public',
+    Private: 'private',
 });
 
 const assistantSchema = new mongoose.Schema({
@@ -28,28 +40,34 @@ const assistantSchema = new mongoose.Schema({
     },
     _permission: {
         type: [String],
-        enum: Object.values(eventPermissions),
+        enum: Object.values(assistantPermissions),
     },
+},{
+    timestamps: true,
 });
 
 const eventSchema = new mongoose.Schema({
 
         code: {
             type: String,
-            required: [true, "Code is required"],
+            require: [true, "Code is required"],
             unique: [true, "Code must be unique"]
+        },
+        user_id: {
+            ref: 'User',
+            require: [true, "User id is required"],
+            type: mongoose.Schema.Types.ObjectId
         },
         name: {
             max: 100,
             type: String,
-            required: [true, "Event name is required"],
-            // unique: [true, "Event name must be unique"]
+            require: [true, "Event name is required"]
         },
-        user_id: {
-            ref: 'User',
-            required: [true, "User id is required"],
-            type: mongoose.Schema.Types.ObjectId
+        mode: {
+            type: String,
+            enum: Object.values(eventModes),
         },
+        description: String,
         selection: {
             default: [],
             type: [selectionSchema]

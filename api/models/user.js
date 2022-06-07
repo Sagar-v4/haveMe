@@ -3,7 +3,7 @@ const {eventPermissions} = require("./event");
 
 const socialDetailsSchema = new mongoose.Schema({
 
-    _id: String,
+    social_id: String,
     _name: String,
 });
 
@@ -24,10 +24,37 @@ const assistSchema = new mongoose.Schema({
         ref: 'Event',
         type: mongoose.Schema.Types.ObjectId,
     },
-    assist_permission: {
+    _permission: {
         type: [String],
         enum: Object.values(eventPermissions),
     },
+},{
+    timestamps: true,
+});
+
+const groupSchema = new mongoose.Schema({
+
+    _name: String,
+    _description: String,
+    _code: {
+        type: String,
+        require: [true, "Code is required"],
+        unique: [true, "Code must be unique"]
+    },
+    _member: [{
+        user_id: {
+            ref: 'User',
+            type: mongoose.Schema.Types.ObjectId,
+        },
+        status: {
+            type: Boolean,
+            default: true,
+        }
+    },{
+        timestamps: true,
+    }]
+},{
+    timestamps: true,
 });
 
 const userSchema = new mongoose.Schema({
@@ -52,6 +79,7 @@ const userSchema = new mongoose.Schema({
             type: String,
             required: [true, "Name is required"]
         },
+        mobile_number: Number,
         dob: {
             type: Date
         },
@@ -70,6 +98,7 @@ const userSchema = new mongoose.Schema({
             default: "https://cdn.pixabay.com/photo/2013/07/13/12/07/avatar-159236_960_720.png",
         },
         assist: [assistSchema],
+        group: [groupSchema],
         forgot_code: {
             type: Number,
             min: 100000,

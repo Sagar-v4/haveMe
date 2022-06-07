@@ -30,18 +30,16 @@ const presenceSchema = new mongoose.Schema(
              * TYPE EXAMPLE
              * [
              *   {
-             *       "type" : "checkbox",
-             *       "name" : "Your fav sport?",
-             *       "options" : [
+             *       "_id" : "54f5g645re",
+             *       "_options" : [
              *           "cricket",
              *           "football",
              *           "basketball"
              *       ]
              *   },
              *   {
-             *       "type" : "radio",
-             *       "name" : "Your gender?",
-             *       "options" : [
+             *       "_id" : "54f5g645re",
+             *       "_options" : [
              *           "male",
              *           "female",
              *           "other"
