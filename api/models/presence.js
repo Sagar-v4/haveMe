@@ -1,5 +1,11 @@
 const mongoose = require('mongoose');
 
+const {QRCodes} = require("./qrcode");
+const {eventModes} = require("./event");
+const {Users, Genders} = require("./user");
+const {selectionTypes} = require("./selection");
+const {assistantPermissions} = require("./assistant");
+
 const selectedSchema = new mongoose.Schema({
 
     selection_id: {

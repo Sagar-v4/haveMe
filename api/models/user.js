@@ -1,8 +1,11 @@
 const mongoose = require('mongoose');
-const {eventPermissions} = require("./event");
+
+const {QRCodes} = require("./qrcode");
+const {eventModes} = require("./event");
+const {selectionTypes} = require("./selection");
+const {assistantPermissions} = require("./assistant");
 
 const socialDetailsSchema = new mongoose.Schema({
-
     social_id: String,
     _name: String,
 });
@@ -16,45 +19,6 @@ const Genders = Object.freeze({
     Male: 'male',
     Female: 'female',
     Other: 'other',
-});
-
-const assistSchema = new mongoose.Schema({
-
-    event_id: {
-        ref: 'Event',
-        type: mongoose.Schema.Types.ObjectId,
-    },
-    _permission: {
-        type: [String],
-        enum: Object.values(eventPermissions),
-    },
-},{
-    timestamps: true,
-});
-
-const groupSchema = new mongoose.Schema({
-
-    _name: String,
-    _description: String,
-    _code: {
-        type: String,
-        require: [true, "Code is required"],
-        unique: [true, "Code must be unique"]
-    },
-    _member: [{
-        user_id: {
-            ref: 'User',
-            type: mongoose.Schema.Types.ObjectId,
-        },
-        status: {
-            type: Boolean,
-            default: true,
-        }
-    },{
-        timestamps: true,
-    }]
-},{
-    timestamps: true,
 });
 
 const userSchema = new mongoose.Schema({
@@ -97,8 +61,14 @@ const userSchema = new mongoose.Schema({
             type: String,
             default: "https://cdn.pixabay.com/photo/2013/07/13/12/07/avatar-159236_960_720.png",
         },
-        assist: [assistSchema],
-        group: [groupSchema],
+        assist: [{
+            ref: 'Assistant',
+            type: mongoose.Schema.Types.ObjectId,
+        }],
+        group: [{
+            ref: 'Group',
+            type: mongoose.Schema.Types.ObjectId,
+        }],
         forgot_code: {
             type: Number,
             min: 100000,

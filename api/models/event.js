@@ -1,58 +1,17 @@
 const mongoose = require('mongoose');
 
-const selectionTypes = Object.freeze({
-    Checkbox: 'checkbox',
-    Radio: 'radio',
-    Text: 'text',
-});
-
-const selectionSchema = new mongoose.Schema({
-
-    _name: String,
-    _type: {
-        type: String,
-        enum: Object.values(selectionTypes),
-    },
-    _options: [String],
-},{
-    timestamps: true,
-});
-
-const assistantPermissions = Object.freeze({
-    Edit: 'edit',
-    Group: 'group',
-    QRCode: 'qrcode',
-    Assist: 'assist',
-    Presence: 'presence',
-    Selection: 'selection',
-});
+const {QRCodes} = require("./qrcode");
+const {Users, Genders} = require("./user");
+const {selectionTypes} = require("./selection");
+const {assistantPermissions} = require("./assistant");
 
 const eventModes = Object.freeze({
     Public: 'public',
     Private: 'private',
 });
 
-const assistantSchema = new mongoose.Schema({
-
-    _id: {
-        ref: 'User',
-        type: mongoose.Schema.Types.ObjectId,
-    },
-    _permission: {
-        type: [String],
-        enum: Object.values(assistantPermissions),
-    },
-},{
-    timestamps: true,
-});
-
 const eventSchema = new mongoose.Schema({
 
-        code: {
-            type: String,
-            require: [true, "Code is required"],
-            unique: [true, "Code must be unique"]
-        },
         user_id: {
             ref: 'User',
             require: [true, "User id is required"],
@@ -68,9 +27,10 @@ const eventSchema = new mongoose.Schema({
             enum: Object.values(eventModes),
         },
         description: String,
-        selection: {
-            default: [],
-            type: [selectionSchema]
+        selection: [{
+            ref: 'Selection',
+            type: mongoose.Schema.Types.ObjectId,
+        }],
             /**
              * TYPE EXAMPLE
              * [
@@ -85,10 +45,10 @@ const eventSchema = new mongoose.Schema({
              *      },
              * ]
              */
-        },
-        assistant: {
-            default: [],
-            type: [assistantSchema]
+        assistant: [{
+            ref: 'Assistant',
+            type: mongoose.Schema.Types.ObjectId,
+        }],
             /**
              * TYPE EXAMPLE
              * [
@@ -101,7 +61,6 @@ const eventSchema = new mongoose.Schema({
              *      },
              * ]
              */
-        },
         expire: {
             type: Date,
             min: Date.now()
@@ -120,9 +79,7 @@ const eventSchema = new mongoose.Schema({
 );
 
 Object.assign(eventSchema.statics, {
-    eventPermissions,
-    selectionTypes,
-    selectionSchema
+    eventModes,
 });
 
 //Compile the schema into models
