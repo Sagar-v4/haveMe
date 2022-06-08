@@ -6,15 +6,20 @@ const {Users, Genders} = require("./user");
 const {selectionTypes} = require("./selection");
 const {assistantPermissions} = require("./assistant");
 
-const selectedSchema = new mongoose.Schema({
+const selectedSchema = new mongoose.Schema(
 
-    selection_id: {
-        ref: 'Selection',
-        require: [true, "Selection id is required"],
-        type: mongoose.Schema.Types.ObjectId
+    {
+        selection_id: {
+            ref: 'Selection',
+            require: [true, "Selection id is required"],
+            type: mongoose.Schema.Types.ObjectId
+        },
+        option: [String],
     },
-    _options: [String],
-});
+    {
+        timestamps: true,
+    }
+);
 
 const presenceSchema = new mongoose.Schema(
 
@@ -55,18 +60,11 @@ const presenceSchema = new mongoose.Schema(
              */
         },
         message: {
-            max: 300,
             type: String
         },
 
     },
     {
-        toJSON: {
-            virtuals: true,
-        },
-        toObject: {
-            virtuals: true,
-        },
         timestamps: true,
     }
 );

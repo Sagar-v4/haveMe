@@ -14,27 +14,28 @@ const assistantPermissions = Object.freeze({
     Selection: 'selection',
 });
 
-const assistantSchema = new mongoose.Schema({
+const assistantSchema = new mongoose.Schema(
 
-    user_id: {
-        ref: 'User',
-        require: [true, "User id is required"],
-        type: mongoose.Schema.Types.ObjectId,
+    {
+        user_id: {
+            ref: 'User',
+            require: [true, "User id is required"],
+            type: mongoose.Schema.Types.ObjectId,
+        },
+        event_id: {
+            ref: 'Event',
+            require: [true, "Event id is required"],
+            type: mongoose.Schema.Types.ObjectId
+        },
+        permission: {
+            type: [String],
+            enum: Object.values(assistantPermissions),
+        },
     },
-    event_id: {
-        ref: 'Event',
-        require: [true, "Event id is required"],
-        type: mongoose.Schema.Types.ObjectId
-    },
-    _permission: {
-        type: [String],
-        enum: Object.values(assistantPermissions),
-    },
-},{
-    timestamps: true,
-});
-
-
+    {
+        timestamps: true,
+    }
+);
 Object.assign(assistantSchema.statics, {
     assistantPermissions
 });

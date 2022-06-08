@@ -6,32 +6,44 @@ const {Users, Genders} = require("./user");
 const {selectionTypes} = require("./selection");
 const {assistantPermissions} = require("./assistant");
 
-const memberSchema = new mongoose.Schema({
+const memberSchema = new mongoose.Schema(
 
-    user_id: {
-        ref: 'User',
-        type: mongoose.Schema.Types.ObjectId,
+    {
+        user_id: {
+            ref: 'User',
+            type: mongoose.Schema.Types.ObjectId,
+        },
+        status: {
+            type: Boolean,
+            default: true,
+        }
     },
-    status: {
-        type: Boolean,
-        default: true,
+    {
+        timestamps: true,
     }
-},{
-    timestamps: true,
-});
+);
 
-const groupSchema = new mongoose.Schema({
+const groupSchema = new mongoose.Schema(
 
-    _name: String,
-    _description: String,
-    user_id: {
-        ref: 'User',
-        type: mongoose.Schema.Types.ObjectId,
+    {
+        user_id: {
+            ref: 'User',
+            type: mongoose.Schema.Types.ObjectId,
+        },
+        name: {
+            type: String,
+            require: [true, "Group name is required"]
+        },
+        description: {
+            type: String,
+            require: [true, "Group description name is required"]
+        },
+        member: [memberSchema]
     },
-    _member: [memberSchema]
-},{
-    timestamps: true,
-});
+    {
+        timestamps: true,
+    }
+);
 
 
 module.exports = mongoose.model('Group', groupSchema);

@@ -10,15 +10,15 @@ const eventModes = Object.freeze({
     Private: 'private',
 });
 
-const eventSchema = new mongoose.Schema({
+const eventSchema = new mongoose.Schema(
 
+    {
         user_id: {
             ref: 'User',
             require: [true, "User id is required"],
             type: mongoose.Schema.Types.ObjectId
         },
         name: {
-            max: 100,
             type: String,
             require: [true, "Event name is required"]
         },
@@ -68,12 +68,6 @@ const eventSchema = new mongoose.Schema({
 
     },
     {
-        toJSON: {
-            virtuals: true,
-        },
-        toObject: {
-            virtuals: true,
-        },
         timestamps: true,
     }
 );

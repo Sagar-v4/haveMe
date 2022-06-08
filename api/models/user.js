@@ -5,10 +5,16 @@ const {eventModes} = require("./event");
 const {selectionTypes} = require("./selection");
 const {assistantPermissions} = require("./assistant");
 
-const socialDetailsSchema = new mongoose.Schema({
-    social_id: String,
-    _name: String,
-});
+const socialDetailsSchema = new mongoose.Schema(
+
+    {
+        social_id: String,
+        _name: String,
+    },
+    {
+        timestamps: true,
+    }
+);
 
 const Users = Object.freeze({
     User: 'user',
@@ -21,8 +27,9 @@ const Genders = Object.freeze({
     Other: 'other',
 });
 
-const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema(
 
+    {
         social_detail: [socialDetailsSchema],
         email: {
             type: String,
@@ -38,8 +45,6 @@ const userSchema = new mongoose.Schema({
             type: String
         },
         name: {
-            min: 2,
-            max: 30,
             type: String,
             required: [true, "Name is required"]
         },
