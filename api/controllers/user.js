@@ -1,12 +1,16 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
-const {Users, Genders} = require("../models/user");
+const { Users } = require("../models/user");
 
 // UPDATE
 const updateUser = async (req, res) => {
 
     const user = await User.findOne({ _id: req?.body?.user_id} );
-    if (req?.body?.user_id === req.params.id || user.user_type === Users.Admin) {
+
+    if(!user) return res.status(404).json("User not found");
+    if(!user.status) return res.status(401).json("User not authorised!");
+
+    if (user._id.equals(req.params.id) || user._type === Users.Admin ) {
 
         // IF PASSWORD IS UPDATING
         if (req?.body?.password) {
@@ -38,7 +42,11 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
 
     const user = await User.findOne({ _id: req?.body?.user_id} );
-    if (req?.body?.user_id === req.params.id || user.user_type === Users.Admin) {
+
+    if(!user) return res.status(404).json("User not found");
+    if(!user.status) return res.status(401).json("User not authorised!");
+
+    if (user._id.equals(req.params.id) || user._type === Users.Admin ) {
 
         try {
             await User.deleteOne({_id: req.params.id});
@@ -56,37 +64,54 @@ const deleteUser = async (req, res) => {
 // GET
 const getUser = async (req, res) => {
 
-    try {
-        const user = await User.findById(req.params.id);
+    const user = await User.findOne({ _id: req.params.id} );
 
-        const {password, ...otherDetails} = user._doc;
-        res.status(200).json({...otherDetails});
+    if(!user) return res.status(404).json("User not found");
+    if(!user.status) return res.status(401).json("User not authorised!");
 
-    } catch (err) {
-        res.status(500).json(err);
+    if (user._id.equals(req.params.id) || user._type === Users.Admin ) {
+
+        try {
+            const user = await User.findById(req.params.id);
+
+            const {password, ...otherDetails} = user._doc;
+            res.status(200).json({...otherDetails});
+
+        } catch (err) {
+            res.status(500).json(err);
+        }
+    } else {
+        res.status(403).json("You are not allow to get!");
     }
 }
 
 // GET ALL
 const getUsers = async (req, res) => {
 
-    const user = await User.findById(req.params.id);
-    if(user.user_type === Users.Admin) {
+    const user = await User.findOne({ _id: req.params.id} );
+
+    if(!user) return res.status(404).json("User not found");
+    if(!user.status) return res.status(401).json("User not authorised!");
+
+    if (user._id.equals(req.params.id) || user._type === Users.Admin ) {
+
         try {
             const userProjection = {
                 "_id": 1,
-                "email": 1,
+                "dob" : 1,
                 "name": 1,
-                "user_type": 1,
+                "email": 1,
+                "_type": 1,
                 "avtar": 1,
                 "status": 1,
+                "gender" : 1,
                 "createdAt": 1,
+                "mobile_number" : 1,
+                "email_verified" : 1,
             };
 
-            const users = await User.find({}, userProjection, (err, users) => {
-                if (err) return res.status(500).json(err);
-                res.status(200).json(users);
-            });
+            const users = await User.find({}, userProjection);
+            return res.status(200).json(users);
 
         } catch (err) {
             res.status(500).json(err);

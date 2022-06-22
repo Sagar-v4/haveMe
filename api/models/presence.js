@@ -1,10 +1,9 @@
 const mongoose = require('mongoose');
 
-const {QRCodes} = require("./qrcode");
-const {eventModes} = require("./event");
-const {Users, Genders} = require("./user");
-const {selectionTypes} = require("./selection");
-const {assistantPermissions} = require("./assistant");
+// const {eventModes} = require("./event");
+// const {Users, Genders} = require("./user");
+// const {selectionTypes} = require("./selection");
+// const {assistantPermissions} = require("./assistant");
 
 const selectedSchema = new mongoose.Schema(
 
@@ -22,7 +21,6 @@ const selectedSchema = new mongoose.Schema(
 );
 
 const presenceSchema = new mongoose.Schema(
-
     {
         event_id: {
             ref: 'Event',
@@ -34,34 +32,39 @@ const presenceSchema = new mongoose.Schema(
             require: [true, "User id is required"],
             type: mongoose.Schema.Types.ObjectId
         },
-        selected: {
-            default: [],
-            type: [selectedSchema]
-            /**
-             * TYPE EXAMPLE
-             * [
-             *   {
-             *       "_id" : "54f5g645re",
-             *       "_options" : [
-             *           "cricket",
-             *           "football",
-             *           "basketball"
-             *       ]
-             *   },
-             *   {
-             *       "_id" : "54f5g645re",
-             *       "_options" : [
-             *           "male",
-             *           "female",
-             *           "other"
-             *       ]
-             *   }
-             * ]
-             */
-        },
+        // selected: {
+        //     type: [selectedSchema],
+        //     require: [true, "Selection is required"],
+        // },
+        /**
+         * TYPE EXAMPLE
+         * [
+         *   {
+         *       "_id" : "54f5g645re",
+         *       "_options" : [
+         *           "cricket",
+         *           "football",
+         *           "basketball"
+         *       ]
+         *   },
+         *   {
+         *       "_id" : "54f5g645re",
+         *       "_options" : [
+         *           "male",
+         *           "female",
+         *           "other"
+         *       ]
+         *   }
+         * ]
+         */
         message: {
-            type: String
+            type: String,
+            default: null
         },
+        verified: {
+            type: Boolean,
+            default: false
+        }
 
     },
     {

@@ -5,20 +5,22 @@ import {
     LockOutlined,
     PlusOutlined,
     QrcodeOutlined,
-    UnorderedListOutlined,
-    CheckSquareOutlined,
     SearchOutlined,
     CarryOutOutlined,
     ScanOutlined,
     UsergroupAddOutlined,
-    DisconnectOutlined, LinkOutlined, DeleteOutlined
+    DisconnectOutlined, LinkOutlined, DeleteOutlined, DownloadOutlined, SyncOutlined
 } from '@ant-design/icons';
 import {Affix, Button, Card, Col, Form, Input, Layout, Modal, Row, Select, Space, Table, DatePicker, Tooltip} from 'antd';
 import React, { useState, useRef } from 'react';
+import { QRCode } from 'react-qrcode-logo';
 import Draggable from "react-draggable";
 import moment from 'moment';
 import Highlighter from "react-highlight-words";
 import TextArea from "antd/es/input/TextArea";
+import {useContext, useEffect} from "react";
+import axios from "axios";
+import {AuthContext} from "../context/AuthContext";
 const { Header, Content} = Layout;
 const { Option, OptGroup } = Select;
 const { RangePicker } = DatePicker;
@@ -63,18 +65,6 @@ const disabledRangeTime = (_, type) => {
 };
 // ---------------------------- end date picker -------------------------
 
-// ---------------------------- group data ----------------------------
-const options = [];
-for (let i = 10; i < 36; i++) {
-    const value = i.toString(36) + i;
-    options.push({
-        label: `Long Label: ${value}`,
-        value,
-    });
-}
-const OPTIONS = ['Apples', 'Nails', 'Bananas', 'Helicopters'];
-// ---------------------------- end group data ----------------------------
-
 // ---------------------------- presence data ----------------------------
 const data = [
     {
@@ -106,145 +96,8 @@ const data = [
 
 export default function Event(props) {
 
-    // ---------------------------- new event modal ----------------------------
 
-
-    const [name, setName] = useState();
-    const [mode, setMode] = useState();
-    const [expire, setExpire] = useState();
-    const [description, setDescription] = useState();
-
-    const [nameStatus, setNameStatus] = useState("");
-    const [modeStatus, setModeStatus] = useState("");
-    const [expireStatus, setExpireStatus] = useState("");
-    const [descriptionStatus, setDescriptionStatus] = useState("");
-
-
-    const [visibleNewEvent, setVisibleNewEvent] = useState(false);
-    const [disabledNewEvent, setDisabledNewEvent] = useState(false);
-    const [boundsNewEvent, setBoundsNewEvent] = useState({
-        left: 0,
-        top: 0,
-        bottom: 0,
-        right: 0,
-    });
-
-    const draggleRefNewEvent = useRef(null);
-
-    const showNewEventModal = () => {
-        setVisibleNewEvent(true);
-    };
-
-    const handleOkNewEvent = (e) => {
-        let toReturn = false;
-        if(!name) {
-            setNameStatus( "error");
-            toReturn = true;
-        } else setNameStatus( "");
-
-        if(!mode) {
-            setModeStatus( "error");
-            toReturn = true;
-        } else setModeStatus("");
-
-        if(!expire) {
-            setExpireStatus( "error");
-            toReturn = true;
-        } else setExpireStatus("");
-
-        if(!description) {
-            setDescriptionStatus( "error");
-            toReturn = true;
-        } else setDescriptionStatus("");
-
-        if(toReturn) return;
-
-        setVisibleNewEvent(false);
-    };
-
-    const handleCancelNewEvent = (e) => {
-        console.log(e);
-        setVisibleNewEvent(false);
-    };
-
-    const onStartNewEvent = (_event, uiData) => {
-        const { clientWidth, clientHeight } = window.document.documentElement;
-        const targetRect = draggleRefNewEvent.current?.getBoundingClientRect();
-
-        if (!targetRect) {
-            return;
-        }
-
-        setBoundsNewEvent({
-            left: -targetRect.left + uiData.x,
-            right: clientWidth - (targetRect.right - uiData.x),
-            top: -targetRect.top + uiData.y,
-            bottom: clientHeight - (targetRect.bottom - uiData.y),
-        });
-    };
-
-    // ---------------------------- end new event modal ----------------------------
-
-
-    // ---------------------------- Group selection ----------------------------
-    const [value, setValue] = useState(['a10', 'c12', 'h17', 'j19', 'k20']);
-    const [selectedItems, setSelectedItems] = useState([]);
-    const filteredOptions = OPTIONS.filter((o) => !selectedItems.includes(o));
-
-    const selectProps = {
-        mode: 'multiple',
-        style: {
-            width: '100%',
-        },
-        value,
-        options,
-        onChange: (newValue) => {
-            setValue(newValue);
-        },
-        placeholder: 'Select Item...',
-        maxTagCount: 'responsive',
-    };
-
-
-    const [visibleGrp, setVisibleGrp] = useState(false);
-    const [disabledGrp, setDisabledGrp] = useState(false);
-    const [boundsGrp, setBoundsGrp] = useState({
-        left: 0,
-        top: 0,
-        bottom: 0,
-        right: 0,
-    });
-
-
-    const draggleRefGrp = useRef(null);
-
-    const showGrpModal = () => {
-        setVisibleGrp(true);
-    };
-
-    const handleCancelGrp = (e) => {
-        console.log(e);
-        setVisibleGrp(false);
-    };
-
-    const onStartGrp = (_event, uiData) => {
-        const {clientWidth, clientHeight} = window.document.documentElement;
-        const targetRect = draggleRefGrp.current?.getBoundingClientRect();
-
-        if (!targetRect) {
-            return;
-        }
-
-        setBoundsGrp({
-            left: -targetRect.left + uiData.x,
-            right: clientWidth - (targetRect.right - uiData.x),
-            top: -targetRect.top + uiData.y,
-            bottom: clientHeight - (targetRect.bottom - uiData.y),
-        });
-    };
-    // ---------------------------- end Group selection ----------------------------
-
-
+    const { user } = useContext(AuthContext);
     // ---------------------------- dummy data  for table ----------------------------
 
     const [searchText, setSearchText] = useState('');
@@ -493,6 +346,57 @@ export default function Event(props) {
     };
     // ---------------------------- end assist modal ----------------------------
 
+    // ----------------------------  QR modal ----------------------------
+    const [visibleQR, setVisibleQR] = useState(false);
+    const [disabledQR, setDisabledQR] = useState(false);
+    const [boundsQR, setBoundsQR] = useState({
+        left: 0,
+        top: 0,
+        bottom: 0,
+        right: 0,
+    });
+
+
+    const draggleRefQR = useRef(null);
+
+    const showQRModal = () => {
+        setVisibleQR(true);
+    };
+
+    const handleCancelQR = (e) => {
+        console.log(e);
+        setVisibleQR(false);
+    };
+
+    const onStartQR = (_event, uiData) => {
+        const {clientWidth, clientHeight} = window.document.documentElement;
+        const targetRect = draggleRefQR.current?.getBoundingClientRect();
+
+        if (!targetRect) {
+            return;
+        }
+
+        setBoundsQR({
+            left: -targetRect.left + uiData.x,
+            right: clientWidth - (targetRect.right - uiData.x),
+            top: -targetRect.top + uiData.y,
+            bottom: clientHeight - (targetRect.bottom - uiData.y),
+        });
+    };
+    // ---------------------------- end QR modal ----------------------------
+    const [events, setEvents] = useState([]);
+
+    useEffect(() => {
+        const fetchEvents = async () => {
+            const res = await axios.get("http://localhost:5000/api/assist/" + user._id + "/user");
+            setEvents(res.data.sort((e1, e2) => {
+                return new Date(e1.expire) - new Date(e2.expire);
+            }));
+        };
+        fetchEvents().then(r => console.log(r));
+    }, [user._id]);
+    console.log("events: ", events)
+
     return (
 
         <>
@@ -504,191 +408,80 @@ export default function Event(props) {
                     position: "fixed",
                     padding: 0,
                 }}
-            ><h1>Event</h1></Header>
+            ><h1>Assist</h1></Header>
             <Content
                 style={{
                     margin: '84px 16px 16px',
                 }}
             >
                 <div className="site-card-wrapper">
-                    <Row gutter={16}>
-                        <Col span={8}>
-                            <Card
-                                title="Msc IT CS Attendance"
-                                extra={
-                                    <Tooltip title="Edit">
-                                        <Button onClick={showNewEventModal} icon={<EditOutlined/>}/>
-                                    </Tooltip>
-                                }
+                    <Row gutter={{
+                        xs: 8,
+                        sm: 16,
+                        md: 24,
+                    }} >
+                        {events.map(event =>
+
+                            <Col
+                                gutter={{
+                                    xs: 8,
+                                    sm: 16,
+                                    md: 24,
+                                    lg: 32,
+                                }}
+                                xs={24} sm={12} md={12} lg={8} xl={6}
+                                style={{
+                                    marginBottom: "20px",
+                                }}>
+                                <Card
+                                    title={event.name}
+                                    extra={
+                                        <Tooltip title="Delete">
+                                            <Button icon={<DeleteOutlined/>}/>
+                                        </Tooltip>
+                                    }
 
 
-                                // onClick={(value) => setCollapsed(!collapsed)}
-                                actions={[
+                                    // onClick={(value) => setCollapsed(!collapsed)}
+                                    actions={[
 
-                                    // <Tooltip title="Groups"><UsergroupAddOutlined onClick={showGrpModal}/></Tooltip>,
-                                    // <Tooltip title="Assistants"><LockOutlined onClick={showAssistModal}/></Tooltip>,
-                                    // <Tooltip title="Selections"><CarryOutOutlined  onClick={showSelectModal}/></Tooltip>,
-                                    // <Tooltip title="Presences"><ScanOutlined onClick={showListModal}/></Tooltip>,
-                                    <Tooltip title="QRCode"><QrcodeOutlined/></Tooltip>,
-                                ]}
-                            >
-                                <div>
-                                    <FieldTimeOutlined/> <span>04 : 05 : 40</span>
-                                </div>
-                                <div>
-                                    <DisconnectOutlined /> <span>Private</span>
-                                </div>
-                                <div>
-                                    <p>This is one an only attendance sheet of msc it batch 23 of subject SP in winter
-                                        semester 2022.</p>
-                                </div>
-                            </Card>
-                        </Col>
-                        <Col span={8}>
-                            <Card
-                                title="Msc IT CS Attendance"
-                                extra={
-                                    <Tooltip title="Edit">
-                                        <Button onClick={showNewEventModal} icon={<EditOutlined/>}/>
-                                    </Tooltip>
-                                }
-
-                                // onClick={(value) => setCollapsed(!collapsed)}
-                                actions={[
-
-                                    // <Tooltip title="Groups"><UsergroupAddOutlined onClick={showGrpModal}/></Tooltip>,
-                                    <Tooltip title="Assistants"><LockOutlined onClick={showAssistModal}/></Tooltip>,
-                                    <Tooltip title="Selections"><CarryOutOutlined  onClick={showSelectModal}/></Tooltip>,
-                                    // <Tooltip title="Presences"><ScanOutlined onClick={showListModal}/></Tooltip>,
-                                    <Tooltip title="QRCode"><QrcodeOutlined/></Tooltip>,
-                                ]}
-                            >
-                                <div>
-                                    <FieldTimeOutlined/> <span>04 : 05 : 40</span>
-                                </div>
-                                <div>
-                                    <LinkOutlined /> <span>Public</span>
-                                </div>
-                                <div>
-                                    <p>This is one an only attendance sheet of msc it batch 23 of subject SP in winter
-                                        semester 2022.</p>
-                                </div>
-                            </Card>
-                        </Col>
-                        <Col span={8}>
-                            <Card
-                                title="Msc IT CS Attendance"
-                                extra={
-                                    <Tooltip title="Edit" >
-                                        <Button onClick={showNewEventModal} disabled icon={<EditOutlined/>}/>
-                                    </Tooltip>
-                                }
-
-                                // onClick={(value) => setCollapsed(!collapsed)}
-                                actions={[
-
-                                    // <Tooltip title="Groups"><UsergroupAddOutlined onClick={showGrpModal}/></Tooltip>,
-                                    // <Tooltip title="Assistants"><LockOutlined onClick={showAssistModal}/></Tooltip>,
-                                    // <Tooltip title="Selections"><CarryOutOutlined  onClick={showSelectModal}/></Tooltip>,
-                                    <Tooltip title="Presences"><ScanOutlined onClick={showListModal}/></Tooltip>,
-                                    <Tooltip title="QRCode"><QrcodeOutlined/></Tooltip>,
-                                ]}
-                            >
-                                <div>
-                                    <FieldTimeOutlined/> <span>04 : 05 : 40</span>
-                                </div>
-                                <div>
-                                    <LinkOutlined /> <span>Public</span>
-                                </div>
-                                <div>
-                                    <p>This is one an only attendance sheet of msc it batch 23 of subject SP in winter
-                                        semester 2022.</p>
-                                </div>
-                            </Card>
-                        </Col>
+                                        // <Tooltip title="Assistants"><LockOutlined onClick={showAssistModal && setEventAssistId(event._id)}/></Tooltip>,
+                                        // {event.permi
+                                        <Tooltip title="Assistants"><LockOutlined onClick={showAssistModal}/></Tooltip>,
+                                    // }
+                                        <Tooltip title="Selections"><CarryOutOutlined onClick={showSelectModal}/></Tooltip>,
+                                        <Tooltip title="Presences"><ScanOutlined onClick={showListModal}/></Tooltip>,
+                                        <Tooltip title="QRCode"><QrcodeOutlined onClick={showQRModal}/></Tooltip>,
+                                    ]}
+                                >
+                                    <div>
+                                        <FieldTimeOutlined/> <span>{event.expire}</span>
+                                    </div>
+                                    <div
+                                        style={{
+                                            height: "50px",
+                                            overflowY: "hidden",
+                                            textTransform: "capitalize"
+                                        }}>
+                                        <p>{event.description}</p>
+                                    </div>
+                                </Card>
+                            </Col>
+                        )}
                     </Row>
                 </div>
 
             </Content>
 
-            <Affix className={"btn-fab"}>
-                <Tooltip title="Delete Event">
-                    <Button style={{
-                        width: 60,
-                        height: 60
-                    }} type="danger" onClick={showNewEventModal} size="large" shape="circle" icon={<DeleteOutlined />}/>
-                </Tooltip>
-            </Affix>
+            {/*<Affix className={"btn-fab"}>*/}
+            {/*    <Tooltip title="Delete Event">*/}
+            {/*        <Button style={{*/}
+            {/*            width: 60,*/}
+            {/*            height: 60*/}
+            {/*        }} type="danger" onClick={showNewEventModal} size="large" shape="circle" icon={<DeleteOutlined />}/>*/}
+            {/*    </Tooltip>*/}
+            {/*</Affix>*/}
 
-
-            {/*---------------------------- new event modal ----------------------------*/}
-            <Modal
-                title={
-                    <div
-                        style={{
-                            width: '100%',
-                            cursor: 'move',
-                        }}
-                        onMouseOver={() => {
-                            if (disabledNewEvent) {
-                                setDisabledNewEvent(false);
-                            }
-                        }}
-                        onMouseOut={() => {
-                            setDisabledNewEvent(true);
-                        }}
-                        onFocus={() => {}}
-                        onBlur={() => {}} // end
-                    >
-                        Edit Event
-                    </div>
-                }
-                visible={visibleNewEvent}
-                okText={"Submit"}
-                onOk={handleOkNewEvent}
-                onCancel={handleCancelNewEvent}
-                modalRender={(modal) => (
-                    <Draggable
-                        disabled={disabledNewEvent}
-                        bounds={boundsNewEvent}
-                        onStart={(event, uiData) => onStartNewEvent(event, uiData)}
-                    >
-                        <div ref={draggleRefNewEvent}>{modal}</div>
-                    </Draggable>
-                )}
-            >
-                <Form>
-                    <Form.Item>
-                        <Input showCount maxLength={30} status={nameStatus} value={name} placeholder="Event name*" allowClear onChange={(e)=>setName(e.target.value)} />
-                    </Form.Item>
-                    <Form.Item>
-                        <Select allowClear placeholder={"Event Mode*"} status={modeStatus} value={mode} onChange={(e)=>setMode(e)}>
-                            <Option key={"mode"} value={"public"}>Public</Option>
-                            <Option key={"mode"} value={"private"}>Private</Option>
-                        </Select>
-                    </Form.Item>
-                    <Form.Item>
-                        <DatePicker
-                            placeholder={"Expire date*"}
-                            allowClear
-                            format="YYYY-MM-DD HH:mm:ss"
-                            disabledDate={disabledDate}
-                            disabledTime={disabledDateTime}
-                            showTime={{
-                                defaultValue: moment('00:00:00', 'HH:mm:ss'),
-                            }}
-                            style={{
-                                width: "100%",
-                            }}
-                            status={expireStatus} value={expire} onChange={(e)=>setExpire(e)}
-                        />
-                    </Form.Item>
-                    <Form.Item>
-                        <TextArea showCount maxLength={100} status={descriptionStatus} value={description} placeholder="Event description*" allowClear onChange={(e)=>setDescription(e.target.value)} />
-                    </Form.Item>
-                </Form>
-            </Modal>
-            {/*---------------------------- end new event modal ----------------------------*/}
 
             {/*---------------------------- list modal ----------------------------*/}
             <Modal
@@ -730,71 +523,6 @@ export default function Event(props) {
                 <Table columns={columns} dataSource={data}/>
             </Modal>
             {/*---------------------------- end list modal ----------------------------*/}
-
-            {/*---------------------------- group modal ----------------------------*/}
-            <Modal
-                // footer={null}
-                title={
-                    <div
-                        style={{
-                            width: '100%',
-                            cursor: 'move',
-                        }}
-                        onMouseOver={() => {
-                            if (disabledGrp) {
-                                setDisabledGrp(false);
-                            }
-                        }}
-                        onMouseOut={() => {
-                            setDisabledGrp(true);
-                        }}
-                        onFocus={() => {
-                        }}
-                        onBlur={() => {
-                        }} // end
-                    >
-                        Groups
-                    </div>
-                }
-                visible={visibleGrp}
-                onCancel={handleCancelGrp}
-                modalRender={(modal) => (
-                    <Draggable
-                        disabled={disabledGrp}
-                        bounds={boundsGrp}
-                        onStart={(event, uiData) => onStartGrp(event, uiData)}
-                    >
-                        <div ref={draggleRefGrp}>{modal}</div>
-                    </Draggable>
-                )}
-            >
-
-                {/*{...selectProps}*/}
-                <Select
-                    mode="multiple"
-                    allowClear
-                    placeholder="Inserted are removed"
-                    value={selectedItems}
-                    onChange={setSelectedItems}
-                    style={{
-                        width: '100%',
-                    }}
-                >
-                    {/*{filteredOptions.map((item) => (*/}
-                    {/*    <Select.Option key={item} value={item}>*/}
-                    {/*        {item}*/}
-                    {/*    </Select.Option>*/}
-                    {/*))}*/}
-                    <OptGroup label="Manager">
-                        <Option value="jack">Jack</Option>
-                        <Option value="lucy">Lucy</Option>
-                    </OptGroup>
-                    <OptGroup label="Engineer">
-                        <Option value="Yiminghe">yiminghe</Option>
-                    </OptGroup>
-                </Select>
-            </Modal>
-            {/*---------------------------- end group modal ----------------------------*/}
 
             {/*---------------------------- assist modal ----------------------------*/}
             <Modal
@@ -944,6 +672,72 @@ export default function Event(props) {
                 <Table columns={columns} dataSource={data}/>
             </Modal>
             {/*---------------------------- end selection modal ----------------------------*/}
+
+            {/*---------------------------- QR modal ----------------------------*/}
+            <Modal
+                footer={null}
+                title={
+                    <div
+                        style={{
+                            display: 'flex',
+                            cursor: 'move',
+                        }}
+                        onMouseOver={() => {
+                            if (disabledQR) {
+                                setDisabledQR(false);
+                            }
+                        }}
+                        onMouseOut={() => {
+                            setDisabledQR(true);
+                        }}
+                        onFocus={() => {
+                        }}
+                        onBlur={() => {
+                        }} // end
+                    >
+                        QR Code
+                    </div>
+                }
+                visible={visibleQR}
+                onCancel={handleCancelQR}
+                modalRender={(modal) => (
+                    <Draggable
+                        disabled={disabledQR}
+                        bounds={boundsQR}
+                        onStart={(event, uiData) => onStartQR(event, uiData)}
+                    >
+                        <div ref={draggleRefQR}>{modal}</div>
+                    </Draggable>
+                )}
+            >
+                <div style={{
+                    marginInline: "auto",
+                    justifyContent: "center",
+                    alignItems: "center"
+                }}>
+                    <Row style={{
+                        justifyContent: "center",
+                        alignItems: "center"
+                    }}>
+                        <Col><QRCode size={300} value="https://github.com/gcoro/react-qrcode-logo"/></Col>
+                    </Row>
+                    <Row style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+
+                    }}>
+                        <Col>
+                            <Button type="primary"  icon={<DownloadOutlined />}>
+                                Download
+                            </Button>
+                        </Col>
+                        <Col>
+                            <Button type={"primary"} icon={<SyncOutlined />}>Change</Button>
+                        </Col>
+                    </Row>
+                </div>
+            </Modal>
+            {/*---------------------------- end QR modal ----------------------------*/}
         </>
     );
 };

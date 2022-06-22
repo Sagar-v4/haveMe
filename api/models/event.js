@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
-const {QRCodes} = require("./qrcode");
-const {Users, Genders} = require("./user");
-const {selectionTypes} = require("./selection");
-const {assistantPermissions} = require("./assistant");
+// const {Users, Genders} = require("./user");
+// const {selectionTypes} = require("./selection");
+// const {assistantPermissions} = require("./assistant");
+
 
 const eventModes = Object.freeze({
     Public: 'public',
@@ -13,57 +13,63 @@ const eventModes = Object.freeze({
 const eventSchema = new mongoose.Schema(
 
     {
+        code: {
+            type: String,
+            default: null,
+            sparse: true,
+            unique: [true, "Code must be unique"]
+        },
         user_id: {
             ref: 'User',
-            require: [true, "User id is required"],
-            type: mongoose.Schema.Types.ObjectId
+            type: mongoose.Schema.Types.ObjectId,
+            require: [true, "User id is required"]
         },
         name: {
             type: String,
             require: [true, "Event name is required"]
         },
-        mode: {
+        description: {
             type: String,
-            enum: Object.values(eventModes),
+            require: [true, "Event description is required"]
         },
-        description: String,
-        selection: [{
-            ref: 'Selection',
-            type: mongoose.Schema.Types.ObjectId,
-        }],
-            /**
-             * TYPE EXAMPLE
-             * [
-             *      {
-             *          "name" : "Your fav sport?",
-             *          "type" : "checkbox",
-             *          "options" : [
-             *              "cricket",
-             *              "football",
-             *              "basketball"
-             *          ]
-             *      },
-             * ]
-             */
-        assistant: [{
-            ref: 'Assistant',
-            type: mongoose.Schema.Types.ObjectId,
-        }],
-            /**
-             * TYPE EXAMPLE
-             * [
-             *      {
-             *          "user_id" : "45636843864",
-             *          "permissions" : [
-             *              "change code",
-             *              "see presence",
-             *          ]
-             *      },
-             * ]
-             */
+        /**
+         * TYPE EXAMPLE
+         * [
+         *      {
+         *          "name" : "Your fav sport?",
+         *          "type" : "checkbox",
+         *          "options" : [
+         *              "cricket",
+         *              "football",
+         *              "basketball"
+         *          ]
+         *      },
+         * ]
+         */
+        // assistant: {
+        //     type: [{
+        //         ref: 'Assistant',
+        //         type: mongoose.Schema.Types.ObjectId,
+        //     }],
+        //     default: []
+        // },
+        /**
+         * TYPE EXAMPLE
+         * [
+         *      {
+         *          "user_id" : "45636843864",
+         *          "permissions" : [
+         *              "change code",
+         *              "see presence",
+         *          ]
+         *      },
+         * ]
+         */
+
         expire: {
             type: Date,
-            min: Date.now()
+            min: Date.now,
+            require: [true, "Event expire date is required"]
         },
 
     },

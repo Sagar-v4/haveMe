@@ -6,7 +6,7 @@ const register = async (req, res) => {
     try {
         // CHECK IF USER ALREADY EXIST
         const user = await User.findOne({email: req?.body?.email});
-        if(user) return res.status(404).json("User already exist!");
+        if (user) return res.status(404).json("User already exist!");
 
         // HASHING PASSWORD
         const salt = await bcrypt.genSalt(10);
@@ -22,6 +22,7 @@ const register = async (req, res) => {
         // USER SAVE & RESPONSE
         await newUser.save();
         res.status(201).json("User created!");
+        // res.status(201).json("User created!");
 
     } catch (err) {
         res.status(500).json(err);
@@ -35,6 +36,8 @@ const login = async (req, res) => {
         // FOND USER
         const user = await User.findOne({ email: req?.body?.email} );
         if(!user) return res.status(404).json("User not found!");
+
+        if(!user.status) return res.status(401).json("User not authorised!");
 
         // VERIFY PASSWORD
         const isPassCorrect = await bcrypt.compare(req?.body?.password, user.password);

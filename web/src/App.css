@@ -23,3 +23,15 @@ h1 {
   right: 50px;
   bottom: 50px;
 }
+
+@media print {
+
+  body * {
+    visibility: hidden;
+  }
+
+  .qr-print, .qr-print * {
+    transform: scale(1.4);
+    visibility: visible;
+  }
+}

@@ -1,17 +1,16 @@
 const mongoose = require('mongoose');
 
-const {QRCodes} = require("./qrcode");
-const {eventModes} = require("./event");
-const {Users, Genders} = require("./user");
-const {selectionTypes} = require("./selection");
+// const {eventModes} = require("./event");
+// const {Users, Genders} = require("./user");
+// const {selectionTypes} = require("./selection");
 
 const assistantPermissions = Object.freeze({
-    Edit: 'edit',
-    Group: 'group',
-    QRCode: 'qrcode',
-    Assist: 'assist',
-    Presence: 'presence',
-    Selection: 'selection',
+    Edit: "edit",
+    Group: "group",
+    QRCode: "qrcode",
+    Assist: "assist",
+    Presence: "presence",
+    Selection: "selection",
 });
 
 const assistantSchema = new mongoose.Schema(
@@ -27,10 +26,11 @@ const assistantSchema = new mongoose.Schema(
             require: [true, "Event id is required"],
             type: mongoose.Schema.Types.ObjectId
         },
-        permission: {
-            type: [String],
-            enum: Object.values(assistantPermissions),
-        },
+        // permission: {
+        //     default: [],
+        //     type: [String],
+        //     enum: Object.values(assistantPermissions),
+        // }
     },
     {
         timestamps: true,

@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
 
-const {QRCodes} = require("./qrcode");
-const {eventModes} = require("./event");
-const {selectionTypes} = require("./selection");
-const {assistantPermissions} = require("./assistant");
+// const {eventModes} = require("./event");
+// const {selectionTypes} = require("./selection");
+// const {assistantPermissions} = require("./assistant");
 
 const socialDetailsSchema = new mongoose.Schema(
 
@@ -17,11 +16,13 @@ const socialDetailsSchema = new mongoose.Schema(
 );
 
 const Users = Object.freeze({
+    Null: null,
     User: 'user',
     Admin: 'admin',
 });
 
 const Genders = Object.freeze({
+    Null: null,
     Male: 'male',
     Female: 'female',
     Other: 'other',
@@ -30,7 +31,10 @@ const Genders = Object.freeze({
 const userSchema = new mongoose.Schema(
 
     {
-        social_detail: [socialDetailsSchema],
+        // social_detail: {
+        //     type: [socialDetailsSchema],
+        //     default: []
+        // },
         email: {
             type: String,
             lowercase: true,
@@ -41,24 +45,29 @@ const userSchema = new mongoose.Schema(
             default: false
         },
         password: {
-            min: 6,
-            type: String
+            type: String,
+            default: null
         },
         name: {
             type: String,
-            required: [true, "Name is required"]
+            require: [true, "Name is required"]
         },
-        mobile_number: Number,
+        mobile_number: {
+            type: Number,
+            default: null
+        },
         dob: {
-            type: Date
+            type: Date,
+            default: null,
         },
         gender: {
             type: String,
-            enum: Object.values(Genders),
+            default: Genders.Null,
+            enum: Object.values(Genders)
         },
-        user_type: {
+        _type: {
             type: String,
-            default: Users.User,
+            default: Users.Null,
             enum: Object.values(Users),
             require: [true, "User type is required"]
         },
@@ -66,21 +75,15 @@ const userSchema = new mongoose.Schema(
             type: String,
             default: "https://cdn.pixabay.com/photo/2013/07/13/12/07/avatar-159236_960_720.png",
         },
-        assist: [{
-            ref: 'Assistant',
-            type: mongoose.Schema.Types.ObjectId,
-        }],
-        group: [{
-            ref: 'Group',
-            type: mongoose.Schema.Types.ObjectId,
-        }],
         forgot_code: {
             type: Number,
             min: 100000,
-            max: 999999
+            max: 999999,
+            default: null
         },
         forgot_time: {
-            type: Date
+            type: Date,
+            default: null
         },
         status: {
             type: Boolean,
@@ -110,6 +113,12 @@ Object.assign(userSchema.statics, {
 // //match password
 // userSchema.methods.isPasswordMatched = async function (enteredPassword) {
 //     return await bcrypt.compare(enteredPassword, this.password);
+// };
+
+
+// Check User completed profile
+// userSchema.methods.profileCompleted = async function (user_id) {
+//     entrants.find({ pincode: { $ne: null } })
 // };
 
 //Compile the schema into models

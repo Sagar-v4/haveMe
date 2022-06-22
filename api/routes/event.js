@@ -1,6 +1,6 @@
 
 const router = require("express").Router();
-const {createEvent, updateEvent, getEvent, getEvents, deleteEvent, } = require("../controllers/event");
+const {createEvent, updateEvent, getEvent, getEvents, deleteEvent, getUserEvents, updateEventQR, } = require("../controllers/event");
 
 // TEST
 router.get("/", (req, res) => {
@@ -13,13 +13,19 @@ router.post("/", createEvent);
 // UPDATE
 router.put("/:id", updateEvent);
 
+// UPDATE QR
+router.put("/:id/qr", updateEventQR);
+
 // DELETE
 router.delete("/:id", deleteEvent);
 
 // GET
 router.get("/:id", getEvent);
 
-// GET ALL
+// GET ALL user
+router.get("/:id/user", getUserEvents);
+
+// GET ALL admin
 router.get("/:id/all", getEvents);
 
 module.exports = router;

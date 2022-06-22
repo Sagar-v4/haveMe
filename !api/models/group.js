@@ -29,6 +29,7 @@ const groupSchema = new mongoose.Schema(
         user_id: {
             ref: 'User',
             type: mongoose.Schema.Types.ObjectId,
+            require: [true, "User id is required"]
         },
         name: {
             type: String,

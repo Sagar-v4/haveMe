@@ -1,0 +1,25 @@
+.logo {
+  height: 32px;
+  margin: 16px;
+  display: flex;
+  color: #4CAF50;
+  text-decoration-thickness: 10px;
+  align-items: center;
+  justify-content: center;
+  /*background: rgba(255, 255, 255, 0.3);*/
+}
+
+.site-layout .site-layout-background {
+  background: #fff;
+}
+
+h1 {
+  margin-left: 20px;
+  text-transform: capitalize;
+}
+
+.btn-fab {
+  position: fixed;
+  right: 50px;
+  bottom: 50px;
+}
