@@ -1,3 +1,3 @@
 # haveMe
 
-Live: https://haveme.netlify.app
+Live: https://have-me.netlify.app
