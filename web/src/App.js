@@ -13,10 +13,12 @@ import Profile from "./pages/Profile";
 import Assist from "./pages/Assist";
 import Presence from "./pages/Presence";
 
-import {Layout, Menu} from 'antd';
-import {CalendarOutlined, HistoryOutlined, ScheduleOutlined, TeamOutlined, UserOutlined} from '@ant-design/icons';
+import {Button, Layout, Menu} from 'antd';
+import {CalendarOutlined, HistoryOutlined, ScheduleOutlined, LogoutOutlined, UserOutlined, DownloadOutlined} from '@ant-design/icons';
 import {AuthContext} from "./context/AuthContext";
 
+const dotenv = require("dotenv");
+dotenv.config();
 const { Sider } = Layout;
 
 function getItem(label, key, icon, children) {
@@ -40,14 +42,22 @@ export default function App() {
     const [collapsed, setCollapsed] = useState(false);
 
     // localStorage.removeItem("currentUser");
-    // const user = localStorage.getItem("currentUser");
+    // const user = localStorage.getItem("user");
+    // alert(user._id);
+
+    const logout = () => {
+        localStorage.clear();
+        // return (<Redirect to={"/"}/> );
+    }
+
+
+    const user = JSON.parse(localStorage.getItem("user"));
     // console.log("curr-------",user);
 
 
 
-
-    const { user } = useContext(AuthContext);
-    console.log("App: user", user);
+    // const { user } = useContext(AuthContext);
+    // console.log("App: user", user);
 
     // const user = {
     //     avtar: "https://cdn.pixabay.com/photo/2013/07/13/12/07/avatar-159236_960_720.png",
@@ -100,6 +110,12 @@ export default function App() {
                             <Menu.Item key={"assist"} icon={<ScheduleOutlined/>}>
                                 <a href={"/assist"}>Assist</a>
                             </Menu.Item>
+                            <Menu.Item key={"download"} icon={<DownloadOutlined />}>
+                                <a href={"/download"}>Download</a>
+                            </Menu.Item>
+                            <Menu.Item key={"logout"} icon={<LogoutOutlined />}>
+                                <a onClick={logout} href={"/"}>Logout</a>
+                            </Menu.Item>
 
                         </Menu>
                     </Sider>
@@ -109,15 +125,15 @@ export default function App() {
                             { user ? <Profile/> : <Redirect to={"/"}/> }
                         </Route>
                         <Route path={"/event"}>
-                            { console.log("App Event: user", user) }
+                            {/*{ console.log("App Event: user", user) }*/}
                             {user ? <Event user={user}/> : <Redirect to={"/"}/>}
                         </Route>
                         <Route path={"/presence"}>
-                            { console.log("App Presence: user", user) }
+                            {/*{ console.log("App Presence: user", user) }*/}
                             {user ? <Presence user={user}/> : <Redirect to={"/"}/>}
                         </Route>
                         <Route path={"/assist"}>
-                            { console.log("App Assist: user", user) }
+                            {/*{ console.log("App Assist: user", user) }*/}
                             {user ? <Assist user={user}/> : <Redirect to={"/"}/>}
                         </Route>
                         {/*<Assist/>*/}

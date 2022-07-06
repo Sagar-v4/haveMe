@@ -43,9 +43,13 @@ const { Header, Content} = Layout;
 const { Option, OptGroup } = Select;
 const { RangePicker } = DatePicker;
 
+const dotenv = require("dotenv");
+dotenv.config();
 export default function Event(props) {
 
-    const {user} = useContext(AuthContext);
+    // const {user} = useContext(AuthContext);
+
+    const user = JSON.parse(localStorage.getItem("user"));
     // ---------------------------- new event modal ----------------------------
 
     const [visibleNewEvent, setVisibleNewEvent] = useState(false);
@@ -84,7 +88,7 @@ export default function Event(props) {
         }
 
         try {
-            const res = await axios.put("http://localhost:5000/api/user/" + user._id, editUser);
+            const res = await axios.put(process.env.API_URL + "api/user/" + user._id, editUser);
             message.success('Profile edited..');
             // history.push("/")
         } catch (err) {
@@ -125,7 +129,7 @@ export default function Event(props) {
 
     useEffect(() => {
         const fetchEvents = async () => {
-            const res = await axios.get("http://localhost:5000/api/user/" + user._id);
+            const res = await axios.get(process.env.API_URL + "api/user/" + user._id);
             setCurrUser(res.data);
             setData(res.data);
         };

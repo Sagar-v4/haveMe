@@ -1,10 +1,13 @@
-import { DownOutlined } from '@ant-design/icons';
+import {DeleteTwoTone, DownOutlined} from '@ant-design/icons';
 import {Badge, Collapse, Dropdown, Menu, Space, Table} from 'antd';
 import React, {useState} from 'react';
 import {Content, Header} from "antd/es/layout/layout";
 import {useContext, useEffect} from "react";
 import axios from "axios";
 import {AuthContext} from "../context/AuthContext";
+
+const dotenv = require("dotenv");
+dotenv.config();
 const { Panel } = Collapse;
 const menu = (
     <Menu
@@ -23,7 +26,10 @@ const menu = (
 
 export default function Presence(props) {
 
-    const {user} = useContext(AuthContext);
+    // const user = localStorage.getItem("currentUser");
+    // const {user} = useContext(AuthContext);
+
+    const user = JSON.parse(localStorage.getItem("user"));
 
     const columns = [
         {
@@ -51,12 +57,16 @@ export default function Presence(props) {
             showOnDesktop: true
         },
         {
-            title: 'Verification',
+            title: 'Verified',
             dataIndex: 'verified',
             key: 'verified',
             width: '10%',
             showOnResponse: true,
-            showOnDesktop: true
+            showOnDesktop: true,
+            render: (verified) => (
+                <>
+                    {verified ? "Verified" : "Not Verified"}
+                </>),
         },
     ];
 
@@ -65,7 +75,7 @@ export default function Presence(props) {
 
     useEffect(() => {
         const fetchQR = async () => {
-            const res = await axios.get("http://localhost:5000/api/presence/" + user._id + "/user");
+            const res = await axios.get(process.env.API_URL + "api/presence/" + user._id + "/user");
             res.data.map(r => {
                 r.key = r._id;
                 r.name = r.event_id.name;

@@ -41,6 +41,8 @@ const { Header, Content} = Layout;
 const { Option, OptGroup } = Select;
 const { RangePicker } = DatePicker;
 
+const dotenv = require("dotenv");
+dotenv.config();
 // --------------------- date picker ------------------------------
 
 const range = (start, end) => {
@@ -81,110 +83,13 @@ const disabledRangeTime = (_, type) => {
 };
 // ---------------------------- end date picker -------------------------
 
-// ---------------------------- presence data ----------------------------
-const data = [
-    {
-        key: '1',
-        name: 'John Brown',
-        email : 'John@gmail.com',
-        permission: ['assist', 'QRcode']
-    },
-    {
-        key: '2',
-        name: 'Joe Black',
-        email : 'Joe@gmail.com',
-        permission: ['assist', 'QRcode']
-    },
-    {
-        key: '3',
-        name: 'Jim Green',
-        email : 'Jim@gmail.com',
-        permission: ['assist', 'QRcode']
-    },
-    {
-        key: '4',
-        name: 'Jim Red',
-        email : 'Jim@gmail.com',
-        permission: ['assist', 'QRcode']
-    },
-    {
-        key: '2',
-        name: 'Joe Black',
-        email : 'Joe@gmail.com',
-        permission: ['assist', 'QRcode']
-    },
-    {
-        key: '3',
-        name: 'Jim Green',
-        email : 'Jim@gmail.com',
-        permission: ['assist', 'QRcode']
-    },
-    {
-        key: '4',
-        name: 'Jim Red',
-        email : 'Jim@gmail.com',
-        permission: ['assist', 'QRcode']
-    },
-    {
-        key: '2',
-        name: 'Joe Black',
-        email : 'Joe@gmail.com',
-        permission: ['assist', 'QRcode']
-    },
-    {
-        key: '3',
-        name: 'Jim Green',
-        email : 'Jim@gmail.com',
-        permission: ['assist', 'QRcode']
-    },
-    {
-        key: '4',
-        name: 'Jim Red',
-        email : 'Jim@gmail.com',
-        permission: ['assist', 'QRcode']
-    },
-    {
-        key: '2',
-        name: 'Joe Black',
-        email : 'Joe@gmail.com',
-        permission: ['assist', 'QRcode']
-    },
-    {
-        key: '3',
-        name: 'Jim Green',
-        email : 'Jim@gmail.com',
-        permission: ['assist', 'QRcode']
-    },
-    {
-        key: '4',
-        name: 'Jim Red',
-        email : 'Jim@gmail.com',
-        permission: ['assist', 'QRcode']
-    },
-    {
-        key: '2',
-        name: 'Joe Black',
-        email : 'Joe@gmail.com',
-        permission: ['assist', 'QRcode']
-    },
-    {
-        key: '3',
-        name: 'Jim Green',
-        email : 'Jim@gmail.com',
-        permission: ['assist', 'QRcode']
-    },
-    {
-        key: '4',
-        name: 'Jim Red',
-        email : 'Jim@gmail.com',
-        permission: ['assist', 'QRcode']
-    },
-];
-// ---------------------------- end presence data ----------------------------
-
 export default function Event(props) {
 
-    const { user } = useContext(AuthContext);
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+    console.log(user);
+    // console.log(user._id);
+    // const { user } = useContext(AuthContext);
+
     // ---------------------------- new event modal ----------------------------
 
     const [events, setEvents] = useState([]);
@@ -226,7 +131,9 @@ export default function Event(props) {
         }
 
         try {
-            const res = await axios.post("http://localhost:5000/api/event", newEvent);
+            const res = await axios.post(process.env.API_URL + "api/event", newEvent);
+            window.location.reload();
+
             message.success('Event created..');
             // history.push("/")
 
@@ -264,6 +171,90 @@ export default function Event(props) {
     };
 
     // ---------------------------- end new event modal ----------------------------
+
+    // ---------------------------- edit event modal ----------------------------
+
+    // const [events, setEvents] = useState([]);
+    // const [eventId, setEventId] = useState([]);
+    // const [allUsers, setAllUsers] = useState([]);
+
+    // const [name, setName] = useState();
+    // const [expire, setExpire] = useState();
+    // const [description, setDescription] = useState();
+    //
+    // const [nameStatus, setNameStatus] = useState("");
+    // const [expireStatus, setExpireStatus] = useState("");
+    // const [descriptionStatus, setDescriptionStatus] = useState("");
+
+
+    const [visibleEditEvent, setVisibleEditEvent] = useState(false);
+    const [disabledEditEvent, setDisabledEditEvent] = useState(false);
+    const [boundsEditEvent, setBoundsEditEvent] = useState({
+        left: 0,
+        top: 0,
+        bottom: 0,
+        right: 0,
+    });
+
+    const draggleRefEditEvent = useRef(null);
+
+    const showEditEventModal = (event) => {
+
+        setCurrEvent(event);
+        setVisibleEditEvent(true);
+    };
+
+    const onEditEventFinish = async (e) => {
+
+        console.log(e);
+        const EditEvent = {
+            user_id : user._id,
+            name : e.EditEventName,
+            description : e.EditEventDescription,
+            expire : e.EditEventDate
+        }
+
+        try {
+            const res = await axios.put(process.env.API_URL + "api/event/" + currEvent._id, EditEvent);
+            window.location.reload();
+
+            message.success('Event Updated..');
+            // history.push("/")
+
+            setVisibleEditEvent(false);
+        } catch (err) {
+            message.error(err.message);
+        }
+        // console.log('Received values of form: ', e);
+        // console.log(props.user);
+        setVisibleEditEvent(false);
+    };
+
+    const onEditEventFinishFailed = (errorInfo) => {
+        console.log('Failed:', errorInfo);
+    };
+    const handleCancelEditEvent = (e) => {
+        console.log(e);
+        setVisibleEditEvent(false);
+    };
+
+    const onStartEditEvent = (_event, uiData) => {
+        const {clientWidth, clientHeight} = window.document.documentElement;
+        const targetRect = draggleRefNewEvent.current?.getBoundingClientRect();
+
+        if (!targetRect) {
+            return;
+        }
+
+        setBoundsEditEvent({
+            left: -targetRect.left + uiData.x,
+            right: clientWidth - (targetRect.right - uiData.x),
+            top: -targetRect.top + uiData.y,
+            bottom: clientHeight - (targetRect.bottom - uiData.y),
+        });
+    };
+
+    // ---------------------------- end edit event modal ----------------------------
 
 
 
@@ -389,7 +380,7 @@ export default function Event(props) {
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
-            width: '40%',
+            width: '30%',
             ellipsis: true,
             ...getColumnSearchPropsPresence('name'),
         },
@@ -397,9 +388,21 @@ export default function Event(props) {
             title: 'Email',
             dataIndex: 'email',
             key: 'email',
-            width: '50%',
+            width: '40%',
             ellipsis: true,
             ...getColumnSearchPropsPresence( 'email'),
+        },
+        {
+            title: 'Verified',
+            dataIndex: 'verified',
+            key: 'verified',
+            fixed: 'right',
+            width: '20%',
+            ...getColumnSearchPropsPresence('verified'),
+            render: (verified) => (
+                <>
+                    {verified ? "Verified" : "Not Verified"}
+                </>),
         },
         {
             title: 'X',
@@ -408,7 +411,7 @@ export default function Event(props) {
             fixed: 'right',
             width: '10%',
             ...getColumnSearchPropsPresence('_id'),
-            render: (row) => <a ><CheckCircleTwoTone twoToneColor={"green"} onClick={updatePresence.bind(this, row)} /></a>
+            render: (row) => <a ><SyncOutlined onClick={updatePresence.bind(this, row)} /></a>
         },
     ];
 
@@ -679,7 +682,7 @@ export default function Event(props) {
 
     useEffect(() => {
         const fetchEvents = async () => {
-            const res = await axios.get("http://localhost:5000/api/event/" + user._id + "/user");
+            const res = await axios.get(process.env.API_URL + "api/event/" + user._id + "/user");
             setEvents(res.data.sort((e1, e2) => {
                 return new Date(e1.expire) - new Date(e2.expire);
             }));
@@ -691,8 +694,8 @@ export default function Event(props) {
 
     useEffect(() => {
         const fetchPresences = async () => {
-            const presence = await axios.get("http://localhost:5000/api/presence/" + eventId + "/event");
-            // const presence = await axios.get("http://localhost:5000/api/presence/62a9b160f33d22035028dda1/event");
+            const presence = await axios.get(process.env.API_URL + "api/presence/" + eventId + "/event");
+            // const presence = await axios.get(process.env.API_URL + "api/presence/62a9b160f33d22035028dda1/event");
             presence.data.map(r => {
                 r.name = r.user_id.name;
                 r.email = r.user_id.email;
@@ -706,7 +709,7 @@ export default function Event(props) {
 
     useEffect(() => {
         const fetchQR = async () => {
-            const res = await axios.put("http://localhost:5000/api/event/" + currEvent._id + "/qr", { user_id: user._id });
+            const res = await axios.put(process.env.API_URL + "api/event/" + currEvent._id + "/qr", { user_id: user._id });
             setCurrEvent(res.data);
             setQRcode(res.data.code);
         };
@@ -716,19 +719,19 @@ export default function Event(props) {
 
     useEffect(() => {
         const fetchAllUsers = async () => {
-            const users = await axios.get("http://localhost:5000/api/user/" + user._id + "/all");
-            // const presence = await axios.get("http://localhost:5000/api/presence/62a9b160f33d22035028dda1/event");
+            const users = await axios.get(process.env.API_URL + "api/user/" + user._id + "/all");
+            // const presence = await axios.get(process.env.API_URL + "api/presence/62a9b160f33d22035028dda1/event");
             setAllUsers(users.data);
         };
         fetchAllUsers().then(r => console.log(r));
     }, [user]);
-    console.log("PRESENCES: ", presences);
+    // console.log("PRESENCES: ", presences);
 
 
 
     useEffect(() => {
         const setNewPresence = async () => {
-            const p = await axios.post("http://localhost:5000/api/presence", {
+            const p = await axios.post(process.env.API_URL + "api/presence", {
                 "event_id" : eventId,
                 "user_id" : newPresence,
             });
@@ -745,7 +748,7 @@ export default function Event(props) {
 
     useEffect(() => {
         const setNewAssist = async () => {
-            const p = await axios.post("http://localhost:5000/api/assistant/", {
+            const p = await axios.post(process.env.API_URL + "api/assistant/", {
                 "user_id" : newAssist,
                 "event_id" : eventId,
             });
@@ -764,13 +767,13 @@ export default function Event(props) {
 
     useEffect(() => {
         const fetchAssists = async () => {
-            const presence = await axios.get("http://localhost:5000/api/presence/" + eventId + "/event");
+            const presence = await axios.get(process.env.API_URL + "api/presence/" + eventId + "/event");
             presence.data.map(r => {
                 r.name = r.user_id.name;
                 r.email = r.user_id.email;
             });
             setPresences(presence.data);
-            const assist = await axios.get("http://localhost:5000/api/assistant/" + eventId + "/event");
+            const assist = await axios.get(process.env.API_URL + "api/assistant/" + eventId + "/event");
             assist.data.map(r => {
                 r.name = r.user_id.name;
                 r.email = r.user_id.email;
@@ -783,8 +786,8 @@ export default function Event(props) {
 
     useEffect(() => {
         const deleAssist = async () => {
-            const res = await axios.delete("http://localhost:5000/api/assistant/" + delAssist);
-            const assist = await axios.get("http://localhost:5000/api/assistant/" + eventId + "/event");
+            const res = await axios.delete(process.env.API_URL + "api/assistant/" + delAssist);
+            const assist = await axios.get(process.env.API_URL + "api/assistant/" + eventId + "/event");
             assist.data.map(r => {
                 r.name = r.user_id.name;
                 r.email = r.user_id.email;
@@ -796,8 +799,8 @@ export default function Event(props) {
 
     useEffect(() => {
         const updatePresence = async () => {
-            const res = await axios.put("http://localhost:5000/api/presence/" + updPresence);
-            const presence = await axios.get("http://localhost:5000/api/presence/" + eventId + "/event");
+            const res = await axios.put(process.env.API_URL + "api/presence/" + updPresence);
+            const presence = await axios.get(process.env.API_URL + "api/presence/" + eventId + "/event");
             presence.data.map(r => {
                 r.name = r.user_id.name;
                 r.email = r.user_id.email;
@@ -848,7 +851,7 @@ export default function Event(props) {
                                     title={event.name}
                                     extra={
                                         <Tooltip title="Edit">
-                                            <Button onClick={showNewEventModal} icon={<EditOutlined/>}/>
+                                            <Button onClick={showEditEventModal.bind(this, event)} icon={<EditOutlined/>}/>
                                         </Tooltip>
                                     }
 
@@ -890,6 +893,110 @@ export default function Event(props) {
                     }} type="primary" onClick={showNewEventModal} size="large" shape="circle" icon={<PlusOutlined/>}/>
                 </Tooltip>
             </Affix>
+
+            {/*---------------------------- edit event modal ----------------------------*/}
+            <Modal
+                footer={null}
+                title={
+                    <div
+                        style={{
+                            width: '100%',
+                            cursor: 'move',
+                        }}
+                        onMouseOver={() => {
+                            if (disabledNewEvent) {
+                                setDisabledEditEvent(false);
+                            }
+                        }}
+                        onMouseOut={() => {
+                            setDisabledEditEvent(true);
+                        }}
+                        onFocus={() => {
+                        }}
+                        onBlur={() => {
+                        }} // end
+                    >
+                        Edit Event
+                    </div>
+                }
+                visible={visibleEditEvent}
+                onCancel={handleCancelEditEvent}
+                modalRender={(modal) => (
+                    <Draggable
+                        disabled={disabledEditEvent}
+                        bounds={boundsEditEvent}
+                        onStart={(event, uiData) => onStartEditEvent(event, uiData)}
+                    >
+                        <div ref={draggleRefEditEvent}>{modal}</div>
+                    </Draggable>
+                )}
+            >
+                <Form
+                    name="Edit_event"
+                    onFinish={onEditEventFinish}
+                    onFinishFailed={onEditEventFinishFailed}
+                    autoComplete="off"
+                    scrollToFirstError
+                >
+                    <Form.Item
+                        name="EditEventName"
+                        hasFeedback
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Please input event name!',
+                            },
+                        ]}>
+                        <Input showCount maxLength={30} placeholder="Event name *"
+                               allowClear />
+                    </Form.Item>
+
+                    <Form.Item
+                        name="EditEventDate"
+                        hasFeedback
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Please input event expire date!',
+                            },
+                        ]}
+                    >
+                        <DatePicker
+                            placeholder={"Expire date *"}
+                            allowClear
+                            format="YYYY-MM-DD HH:mm:ss"
+                            disabledDate={disabledDate}
+                            disabledTime={disabledDateTime}
+                            showTime={{
+                                defaultValue: moment('00:00:00', 'HH:mm:ss'),
+                            }}
+                            style={{
+                                width: "100%",
+                            }}
+
+                        />
+                    </Form.Item>
+                    <Form.Item
+                        name="EditEventDescription"
+                        hasFeedback
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Please input event name!',
+                            },
+                        ]}>
+                        <TextArea showCount maxLength={100}
+                                  placeholder="Event description *" allowClear
+                        />
+                    </Form.Item>
+                    <Form.Item >
+                        <Button type="primary" htmlType="submit">
+                            Update
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </Modal>
+            {/*---------------------------- end edit event modal ----------------------------*/}
 
 
             {/*---------------------------- new event modal ----------------------------*/}
@@ -985,7 +1092,7 @@ export default function Event(props) {
                         ]}>
                         <TextArea showCount maxLength={100}
                                   placeholder="Event description *" allowClear
-                                 />
+                        />
                     </Form.Item>
                     <Form.Item >
                         <Button type="primary" htmlType="submit">

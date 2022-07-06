@@ -48,9 +48,12 @@ export default function Signup(props) {
         }
 
         try {
-            const res = await axios.post("http://localhost:5000/api/auth/register", register);
-            message.success('Registration successful!\nNow You can Login...');
-            history.push("/")
+            const res = await axios.post(process.env.API_URL + "api/auth/register", register);
+            message.success('Registration successful!');
+            localStorage.setItem("user", JSON.stringify(res.data));
+            // <Route to={"/"}></Route>;
+            window.location.reload();
+            // history.push("/")
         } catch (err) {
             message.error(err.message);
         }

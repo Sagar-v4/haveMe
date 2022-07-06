@@ -26,6 +26,9 @@ function getItem(label, key, icon, children) {
     };
 }
 
+const dotenv = require("dotenv");
+dotenv.config();
+
 const items = [
     getItem('Profile', 'profile', <UserOutlined />),
     getItem('History', 'history', <HistoryOutlined />),

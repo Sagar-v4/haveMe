@@ -1,5 +1,5 @@
 import { Button, Checkbox, Form, Input } from 'antd';
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import {loginCall} from "../apiCalls"
 import {AuthContext} from "../context/AuthContext";
 // import { useNavigate } from "react-router-dom";
@@ -7,6 +7,8 @@ import {AuthContext} from "../context/AuthContext";
 import {Redirect, Route} from "react-router-dom";
 import App from "../App";
 import Event from "../pages/Event";
+import Home from "../pages/Home";
+import axios from "axios";
 
 
 const formItemLayout = {
@@ -42,27 +44,36 @@ const tailFormItemLayout = {
 
 export default function Login(props) {
 
-    const { user, isFetching, error, dispatch} = useContext(AuthContext);
-    const handleClick = (e) => {
-        // console.log(email.current);
-        // console.log('Success:', e);
-        // let navigate = useNavigate();
+    // const { user, isFetching, error, dispatch} = useContext(AuthContext);
 
-        loginCall({email: e.email, password: e.password}, dispatch);
+    const [user, setUser] = useState(null);
+    // const login = async () => {
+    //     const res = await axios.get(process.env.API_URL + "api/auth/login/", {email: e.email, password: e.password});
+    //     setUser(res.data);
+    // };
 
-        if (user) {
-            // localStorage.setItem("currentUser", JSON.stringify(user));
+    const handleClick = async (e) => {
 
-            // this.props.setUser(user);
-            // window.location.reload();
+        // loginCall({email: e.email, password: e.password}, dispatch).then(r => {<Redirect to={"/event"}/>});
 
-            // navigate("/event", { replace: true });
-            // {<Redirect to={"/event"}/>};
-            // const ur = localStorage.getItem("currentUser");
-            // console.log("curr-------",ur);
-        } else {
+        const res = await axios.post(process.env.API_URL + "api/auth/login/", {email: e.email, password: e.password});
+        setUser(res.data);
+        localStorage.setItem("user", JSON.stringify(res.data));
+        // <Route to={"/"}></Route>;
+        window.location.reload();
+        // return <Redirect to="/event" />
+        // login().then(r => console.log(r));
 
-        }
+            // alert(user._id);
+            // localStorage.setItem("user", JSON.stringify(res.data));
+
+            // const user = localStorage.getItem("user");
+            // console.log("id", user);
+        // render() {
+        //     return(
+        //         <Redirect to={"/event"}/>
+        //     )}
+
         // window.location.reload();
 
     };
@@ -75,6 +86,8 @@ export default function Login(props) {
     };
 
     return (
+        <>
+        {/*{ user ? <Redirect to={"/event"}/> : <Home />}*/}
         <Form
             name="login"
             labelCol={{
@@ -139,5 +152,8 @@ export default function Login(props) {
                 </Button>
             </Form.Item>
         </Form>
+
+            {/*{ !user ? <Redirect to={"/"}/> : <Redirect to={"/event"}/> }*/}
+        </>
     );
 };
