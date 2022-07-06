@@ -1,27 +1,7 @@
 import { Button, Checkbox, Form, Input, message } from 'antd';
 import React from 'react';
 import axios from "axios";
-import {Redirect, useHistory} from "react-router-dom";
 
-
-const formItemLayout = {
-    labelCol: {
-        xs: {
-            span: 24,
-        },
-        sm: {
-            span: 8,
-        },
-    },
-    wrapperCol: {
-        xs: {
-            span: 24,
-        },
-        sm: {
-            span: 16,
-        },
-    },
-};
 const tailFormItemLayout = {
     wrapperCol: {
         xs: {
@@ -35,10 +15,9 @@ const tailFormItemLayout = {
     },
 };
 
-export default function Signup(props) {
+export default function Signup() {
 
     const [form] = Form.useForm();
-    const history = useHistory();
 
     const onFinish = async (e) => {
         const register = {
@@ -48,21 +27,17 @@ export default function Signup(props) {
         }
 
         try {
-            const res = await axios.post(process.env.API_URL + "api/auth/register", register);
+            const res = await axios.post("https://haveme-api.herokuapp.com/api/auth/register", register);
             message.success('Registration successful!');
             localStorage.setItem("user", JSON.stringify(res.data));
-            // <Route to={"/"}></Route>;
             window.location.reload();
-            // history.push("/")
         } catch (err) {
             message.error(err.message);
         }
-        console.log('Received values of form: ', e);
-        console.log(props.user);
     };
 
     const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
+        message.error(errorInfo.message).then(r => {});
     };
 
     return (

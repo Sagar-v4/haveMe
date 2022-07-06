@@ -1,33 +1,10 @@
-import {DeleteTwoTone, DownOutlined} from '@ant-design/icons';
-import {Badge, Collapse, Dropdown, Menu, Space, Table} from 'antd';
+import { Table} from 'antd';
 import React, {useState} from 'react';
 import {Content, Header} from "antd/es/layout/layout";
-import {useContext, useEffect} from "react";
+import {useEffect} from "react";
 import axios from "axios";
-import {AuthContext} from "../context/AuthContext";
 
-const dotenv = require("dotenv");
-dotenv.config();
-const { Panel } = Collapse;
-const menu = (
-    <Menu
-        items={[
-            {
-                key: '1',
-                label: 'Action 1',
-            },
-            {
-                key: '2',
-                label: 'Action 2',
-            },
-        ]}
-    />
-);
-
-export default function Presence(props) {
-
-    // const user = localStorage.getItem("currentUser");
-    // const {user} = useContext(AuthContext);
+export default function Presence() {
 
     const user = JSON.parse(localStorage.getItem("user"));
 
@@ -70,12 +47,11 @@ export default function Presence(props) {
         },
     ];
 
-    // const data = [];
     const [data, setPresences] = useState();
 
     useEffect(() => {
-        const fetchQR = async () => {
-            const res = await axios.get(process.env.API_URL + "api/presence/" + user._id + "/user");
+        const fetchPresence = async () => {
+            const res = await axios.get("https://haveme-api.herokuapp.com/api/presence/" + user._id + "/user");
             res.data.map(r => {
                 r.key = r._id;
                 r.name = r.event_id.name;
@@ -83,7 +59,7 @@ export default function Presence(props) {
             });
             setPresences(res.data);
         };
-        fetchQR().then(r => console.log(r));
+        fetchPresence().then(r => console.log(r));
     }, [user._id]);
 
     return (
@@ -93,7 +69,6 @@ export default function Presence(props) {
                 className="site-layout-background"
                 style={{
                     width: "100%",
-                    // display: "block",
                     position: "fixed",
                     padding: 0,
                 }}

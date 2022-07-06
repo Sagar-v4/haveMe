@@ -3,10 +3,8 @@ import React from 'react';
 import Login from "../components/Login";
 import Signup from "../components/Signup";
 const { TabPane } = Tabs;
-const dotenv = require("dotenv");
-dotenv.config();
 
-export default function Home(props) {
+export default function Home() {
 
     return (
         <div style={{
@@ -17,17 +15,15 @@ export default function Home(props) {
             left: "50%",
             transform: "translate(-50%, -50%)",
             marginInline: "auto"
-            // backgroundColor: "red"
         }}>
-            <Tabs defaultActiveKey="1"  centered>
+            <Tabs defaultActiveKey="1" centered>
                 <TabPane tab="Login" key="1">
-                    <Login />
+                    <Login/>
                 </TabPane>
                 <TabPane tab="Signup" key="2">
-                    <Signup />
+                    <Signup/>
                 </TabPane>
             </Tabs>
         </div>
     )
-
 };

@@ -9,7 +9,7 @@ import {
     ScanOutlined,
     DownloadOutlined,
     SyncOutlined,
-    DeleteOutlined, CheckCircleTwoTone, DeleteTwoTone
+    DeleteTwoTone
 } from '@ant-design/icons';
 import {
     Affix,
@@ -34,15 +34,9 @@ import Draggable from "react-draggable";
 import moment from 'moment';
 import Highlighter from "react-highlight-words";
 import TextArea from "antd/es/input/TextArea";
-import {useContext} from "react";
-import {AuthContext} from "../context/AuthContext";
 import axios from "axios";
 const { Header, Content} = Layout;
-const { Option, OptGroup } = Select;
-const { RangePicker } = DatePicker;
 
-const dotenv = require("dotenv");
-dotenv.config();
 // --------------------- date picker ------------------------------
 
 const range = (start, end) => {
@@ -65,45 +59,17 @@ const disabledDateTime = () => ({
     disabledMinutes: () => range(30, 60),
     disabledSeconds: () => [55, 56],
 });
-
-const disabledRangeTime = (_, type) => {
-    if (type === 'start') {
-        return {
-            disabledHours: () => range(0, 60).splice(4, 20),
-            disabledMinutes: () => range(30, 60),
-            disabledSeconds: () => [55, 56],
-        };
-    }
-
-    return {
-        disabledHours: () => range(0, 60).splice(20, 4),
-        disabledMinutes: () => range(0, 31),
-        disabledSeconds: () => [55, 56],
-    };
-};
 // ---------------------------- end date picker -------------------------
 
-export default function Event(props) {
+export default function Event() {
 
-    const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
-    console.log(user);
-    // console.log(user._id);
-    // const { user } = useContext(AuthContext);
+    const [user] = useState(JSON.parse(localStorage.getItem("user")));
 
     // ---------------------------- new event modal ----------------------------
 
     const [events, setEvents] = useState([]);
     const [eventId, setEventId] = useState([]);
     const [allUsers, setAllUsers] = useState([]);
-
-    const [name, setName] = useState();
-    const [expire, setExpire] = useState();
-    const [description, setDescription] = useState();
-
-    const [nameStatus, setNameStatus] = useState("");
-    const [expireStatus, setExpireStatus] = useState("");
-    const [descriptionStatus, setDescriptionStatus] = useState("");
-
 
     const [visibleNewEvent, setVisibleNewEvent] = useState(false);
     const [disabledNewEvent, setDisabledNewEvent] = useState(false);
@@ -122,7 +88,6 @@ export default function Event(props) {
 
     const onNewEventFinish = async (e) => {
 
-        console.log(e);
         const newEvent = {
             user_id : user._id,
             name : e.newEventName,
@@ -131,26 +96,21 @@ export default function Event(props) {
         }
 
         try {
-            const res = await axios.post(process.env.API_URL + "api/event", newEvent);
+            await axios.post("https://haveme-api.herokuapp.com/api/event", newEvent)
+                .then(message.success('Event created..'));
             window.location.reload();
-
-            message.success('Event created..');
-            // history.push("/")
 
             setVisibleNewEvent(false);
         } catch (err) {
             message.error(err.message);
         }
-        // console.log('Received values of form: ', e);
-        // console.log(props.user);
         setVisibleNewEvent(false);
     };
 
     const onNewEventFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
+        message.error(errorInfo.message).then(r => {});
     };
     const handleCancelNewEvent = (e) => {
-        console.log(e);
         setVisibleNewEvent(false);
     };
 
@@ -174,19 +134,6 @@ export default function Event(props) {
 
     // ---------------------------- edit event modal ----------------------------
 
-    // const [events, setEvents] = useState([]);
-    // const [eventId, setEventId] = useState([]);
-    // const [allUsers, setAllUsers] = useState([]);
-
-    // const [name, setName] = useState();
-    // const [expire, setExpire] = useState();
-    // const [description, setDescription] = useState();
-    //
-    // const [nameStatus, setNameStatus] = useState("");
-    // const [expireStatus, setExpireStatus] = useState("");
-    // const [descriptionStatus, setDescriptionStatus] = useState("");
-
-
     const [visibleEditEvent, setVisibleEditEvent] = useState(false);
     const [disabledEditEvent, setDisabledEditEvent] = useState(false);
     const [boundsEditEvent, setBoundsEditEvent] = useState({
@@ -206,7 +153,6 @@ export default function Event(props) {
 
     const onEditEventFinish = async (e) => {
 
-        console.log(e);
         const EditEvent = {
             user_id : user._id,
             name : e.EditEventName,
@@ -215,26 +161,21 @@ export default function Event(props) {
         }
 
         try {
-            const res = await axios.put(process.env.API_URL + "api/event/" + currEvent._id, EditEvent);
+            await axios.put("https://haveme-api.herokuapp.com/api/event/" + currEvent._id, EditEvent)
+                .then(message.success('Event Updated..'));
             window.location.reload();
-
-            message.success('Event Updated..');
-            // history.push("/")
 
             setVisibleEditEvent(false);
         } catch (err) {
             message.error(err.message);
         }
-        // console.log('Received values of form: ', e);
-        // console.log(props.user);
         setVisibleEditEvent(false);
     };
 
     const onEditEventFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
+        message.error(errorInfo.message).then(r => {});
     };
-    const handleCancelEditEvent = (e) => {
-        console.log(e);
+    const handleCancelEditEvent = () => {
         setVisibleEditEvent(false);
     };
 
@@ -280,7 +221,6 @@ export default function Event(props) {
     };
 
     const handleCancelList = (e) => {
-        console.log(e);
         setVisibleList(false);
     };
 
@@ -373,7 +313,6 @@ export default function Event(props) {
 
     const updatePresence = (value) => {
         setUpdPresence(value);
-        console.log(`selected update ${value}`);
     };
     const PresenceColumns = [
         {
@@ -443,9 +382,6 @@ export default function Event(props) {
 
 
     // ----------------------------  Assist modal ----------------------------
-
-
-    // events.map(event => {
 
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
@@ -552,7 +488,6 @@ export default function Event(props) {
 
     const deleteAssist = (value) => {
         setDelAssist(value);
-        console.log(`selected ${value}`);
     };
     const AssistColumns = [
         {
@@ -601,7 +536,6 @@ export default function Event(props) {
     };
 
     const handleCancelAssist = (e) => {
-        console.log(e);
         setVisibleAssist(false);
     };
 
@@ -653,12 +587,10 @@ export default function Event(props) {
     const showQRModal = (id) => {
         setCurrEvent(id);
         setQRcode(id.code);
-        console.log("QRCODE :", QRcode)
         setVisibleQR(true);
     };
 
     const handleCancelQR = (e) => {
-        console.log(e);
         setVisibleQR(false);
     };
 
@@ -682,133 +614,165 @@ export default function Event(props) {
 
     useEffect(() => {
         const fetchEvents = async () => {
-            const res = await axios.get(process.env.API_URL + "api/event/" + user._id + "/user");
-            setEvents(res.data.sort((e1, e2) => {
-                return new Date(e1.expire) - new Date(e2.expire);
-            }));
+
+            try {
+                const res = await axios.get("https://haveme-api.herokuapp.com/api/event/" + user._id + "/user");
+                setEvents(res.data.sort((e1, e2) => {
+                    return new Date(e1.expire) - new Date(e2.expire);
+                }));
+            } catch (err) {
+                message.error(err.message);
+            }
         };
-        fetchEvents().then(r => console.log(r));
+        fetchEvents().then(r => {});
     }, [user._id]);
-    console.log("events: ", events);
 
 
     useEffect(() => {
         const fetchPresences = async () => {
-            const presence = await axios.get(process.env.API_URL + "api/presence/" + eventId + "/event");
-            // const presence = await axios.get(process.env.API_URL + "api/presence/62a9b160f33d22035028dda1/event");
-            presence.data.map(r => {
-                r.name = r.user_id.name;
-                r.email = r.user_id.email;
-            });
-            setPresences(presence.data);
+            try {
+                const presence = await axios.get("https://haveme-api.herokuapp.com/api/presence/" + eventId + "/event");
+                presence.data.map(r => {
+                    r.name = r.user_id.name;
+                    r.email = r.user_id.email;
+                });
+                setPresences(presence.data);
+            } catch (err) {
+                // message.error(err.message);
+            }
         };
-        fetchPresences().then(r => console.log(r));
+        fetchPresences().then(r => {});
     }, [eventId]);
-    console.log("PRESENCES: ", presences);
 
 
     useEffect(() => {
         const fetchQR = async () => {
-            const res = await axios.put(process.env.API_URL + "api/event/" + currEvent._id + "/qr", { user_id: user._id });
-            setCurrEvent(res.data);
-            setQRcode(res.data.code);
+            try {
+                const res = await axios.put("https://haveme-api.herokuapp.com/api/event/" + currEvent._id + "/qr", {user_id: user._id});
+                setCurrEvent(res.data);
+                setQRcode(res.data.code);
+            } catch (err) {
+                // message.error(err.message);
+            }
         };
-        fetchQR().then(r => console.log(r));
+        fetchQR().then(r => {});
     }, [updateQR]);
 
 
     useEffect(() => {
         const fetchAllUsers = async () => {
-            const users = await axios.get(process.env.API_URL + "api/user/" + user._id + "/all");
-            // const presence = await axios.get(process.env.API_URL + "api/presence/62a9b160f33d22035028dda1/event");
-            setAllUsers(users.data);
+            try {
+                const users = await axios.get("https://haveme-api.herokuapp.com/api/user/" + user._id + "/all");
+                setAllUsers(users.data);
+            } catch (err) {
+                // message.error(err.message);
+            }
         };
-        fetchAllUsers().then(r => console.log(r));
+        fetchAllUsers().then(r => {});
     }, [user]);
-    // console.log("PRESENCES: ", presences);
-
-
 
     useEffect(() => {
         const setNewPresence = async () => {
-            const p = await axios.post(process.env.API_URL + "api/presence", {
-                "event_id" : eventId,
-                "user_id" : newPresence,
-            });
-            console.log("new presence post: ", p.data)
-            p.data.map(r => {
-                r.name = r.user_id.name;
-                r.email = r.user_id.email;
-            });
-            setPresences(p.data);
+            try {
+                const p = await axios.post("https://haveme-api.herokuapp.com/api/presence", {
+                    "event_id": eventId,
+                    "user_id": newPresence,
+                });
+                p.data.map(r => {
+                    r.name = r.user_id.name;
+                    r.email = r.user_id.email;
+                });
+                setPresences(p.data);
+                message.success('New presence added successful!');
+            } catch (err) {
+                // message.error(err.message);
+            }
         };
-        setNewPresence().then(r => console.log(r));
+        setNewPresence().then(r => {});
     }, [newPresence]);
 
 
     useEffect(() => {
         const setNewAssist = async () => {
-            const p = await axios.post(process.env.API_URL + "api/assistant/", {
-                "user_id" : newAssist,
-                "event_id" : eventId,
-            });
-            console.log("new Assist post: ", p.data)
-            p.data.map(r => {
-                r.name = r.user_id.name;
-                r.email = r.user_id.email;
-            });
-            setAssist(p.data);
+            try {
+                const p = await axios.post("https://haveme-api.herokuapp.com/api/assistant/", {
+                    "user_id" : newAssist,
+                    "event_id" : eventId,
+                });
+                p.data.map(r => {
+                    r.name = r.user_id.name;
+                    r.email = r.user_id.email;
+                });
+                setAssist(p.data);
+                message.success('New assistant added successful!');
+            } catch (err) {
+                // message.error(err.message);
+            }
         };
-        setNewAssist().then(r => console.log(r));
+        setNewAssist().then(r => {});
     }, [newAssist]);
-    console.log("Assist: ", assist);
 
 
 
     useEffect(() => {
         const fetchAssists = async () => {
-            const presence = await axios.get(process.env.API_URL + "api/presence/" + eventId + "/event");
-            presence.data.map(r => {
-                r.name = r.user_id.name;
-                r.email = r.user_id.email;
-            });
-            setPresences(presence.data);
-            const assist = await axios.get(process.env.API_URL + "api/assistant/" + eventId + "/event");
-            assist.data.map(r => {
-                r.name = r.user_id.name;
-                r.email = r.user_id.email;
-            });
-            setAssist(assist.data);
+            try {
+                const presence = await axios.get("https://haveme-api.herokuapp.com/api/presence/" + eventId + "/event");
+                presence.data.map(r => {
+                    r.name = r.user_id.name;
+                    r.email = r.user_id.email;
+                });
+                setPresences(presence.data);
+                const assist = await axios.get("https://haveme-api.herokuapp.com/api/assistant/" + eventId + "/event");
+                assist.data.map(r => {
+                    r.name = r.user_id.name;
+                    r.email = r.user_id.email;
+                });
+                setAssist(assist.data);
+            } catch (err) {
+                // message.error(err.message);
+            }
         };
-        fetchAssists().then(r => console.log(r));
+        fetchAssists().then(r => {});
     }, [eventId]);
 
 
     useEffect(() => {
         const deleAssist = async () => {
-            const res = await axios.delete(process.env.API_URL + "api/assistant/" + delAssist);
-            const assist = await axios.get(process.env.API_URL + "api/assistant/" + eventId + "/event");
-            assist.data.map(r => {
-                r.name = r.user_id.name;
-                r.email = r.user_id.email;
-            });
-            setAssist(assist.data);
+            try {
+                await axios.delete("https://haveme-api.herokuapp.com/api/assistant/" + delAssist);
+                const assist = await axios.get("https://haveme-api.herokuapp.com/api/assistant/" + eventId + "/event");
+                assist.data.map(r => {
+                    r.name = r.user_id.name;
+                    r.email = r.user_id.email;
+                });
+                setAssist(assist.data);
+
+                message.success('Assistant deleted successful!');
+            } catch (err) {
+                // message.error(err.message);
+            }
         };
-        deleAssist().then(r => console.log(r));
+        deleAssist().then(r => {});
     }, [delAssist]);
 
     useEffect(() => {
         const updatePresence = async () => {
-            const res = await axios.put(process.env.API_URL + "api/presence/" + updPresence);
-            const presence = await axios.get(process.env.API_URL + "api/presence/" + eventId + "/event");
-            presence.data.map(r => {
-                r.name = r.user_id.name;
-                r.email = r.user_id.email;
-            });
-            setPresences(presence.data);
+            try {
+                await axios.put("https://haveme-api.herokuapp.com/api/presence/" + updPresence);
+                const presence = await axios.get("https://haveme-api.herokuapp.com/api/presence/" + eventId + "/event");
+                presence.data.map(r => {
+                    r.name = r.user_id.name;
+                    r.email = r.user_id.email;
+                });
+                setPresences(presence.data);
+
+                message.success('Presence updated successful!');
+            } catch (err) {
+                // message.error(err.message);
+            }
         };
-        updatePresence().then(r =>
-            setUpdPresence([]));
+        updatePresence().then(r => {});
     }, [updPresence]);
 
     return (
@@ -855,13 +819,8 @@ export default function Event(props) {
                                         </Tooltip>
                                     }
 
-
-                                    // onClick={(value) => setCollapsed(!collapsed)}
                                     actions={[
-
-                                        // <Tooltip title="Assistants"><LockOutlined onClick={showAssistModal && setEventAssistId(event._id)}/></Tooltip>,
                                         <Tooltip title="Assistants"><LockOutlined onClick={showAssistModal.bind(this, event._id)}/></Tooltip>,
-                                        // <Tooltip title="Selections"><CarryOutOutlined onClick={showSelectModal}/></Tooltip>,
                                         <Tooltip title="Presences"><ScanOutlined onClick={showListModal.bind(this, event._id)}/></Tooltip>,
                                         <Tooltip title="QRCode"><QrcodeOutlined onClick={showQRModal.bind(this, event)}/></Tooltip>,
                                     ]}

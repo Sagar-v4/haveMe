@@ -1,17 +1,6 @@
 import '../App.css';
 import {
     EditOutlined,
-    FieldTimeOutlined,
-    LockOutlined,
-    PlusOutlined,
-    QrcodeOutlined,
-    UnorderedListOutlined,
-    CheckSquareOutlined,
-    SearchOutlined,
-    CarryOutOutlined,
-    ScanOutlined,
-    UsergroupAddOutlined,
-    DisconnectOutlined, LinkOutlined, DownloadOutlined, SyncOutlined
 } from '@ant-design/icons';
 import {
     Affix,
@@ -24,32 +13,20 @@ import {
     Modal,
     Row,
     Select,
-    Space,
-    Table,
     DatePicker,
     Tooltip,
     message, InputNumber
 } from 'antd';
 import React, {useState, useRef, useEffect} from 'react';
-import { QRCode } from 'react-qrcode-logo';
 import Draggable from "react-draggable";
-import moment from 'moment';
-import Highlighter from "react-highlight-words";
-import TextArea from "antd/es/input/TextArea";
-import {useContext} from "react";
-import {AuthContext} from "../context/AuthContext";
 import axios from "axios";
 const { Header, Content} = Layout;
-const { Option, OptGroup } = Select;
-const { RangePicker } = DatePicker;
+const { Option } = Select;
 
-const dotenv = require("dotenv");
-dotenv.config();
-export default function Event(props) {
-
-    // const {user} = useContext(AuthContext);
+export default function Profile() {
 
     const user = JSON.parse(localStorage.getItem("user"));
+
     // ---------------------------- new event modal ----------------------------
 
     const [visibleNewEvent, setVisibleNewEvent] = useState(false);
@@ -63,16 +40,7 @@ export default function Event(props) {
 
     const draggleRefNewEvent = useRef(null);
 
-    const [data, setData] = useState();
-
     const showNewEventModal = () => {
-
-        // this.props.form.setFieldsValue({
-        //     name: currUser.name,
-            // Name: data.field.Name,
-            // Description: data.field.Description,
-            // Value: data.field.Value
-        // })
         setVisibleNewEvent(true);
     };
 
@@ -85,22 +53,21 @@ export default function Event(props) {
             mobile_number: e.mobile_number,
             gender: e.gender,
             dob: e.dob,
+            password: e.password
         }
 
         try {
-            const res = await axios.put(process.env.API_URL + "api/user/" + user._id, editUser);
-            message.success('Profile edited..');
-            // history.push("/")
+            await axios.put("https://haveme-api.herokuapp.com/api/user/" + user._id, editUser)
+                .then(message.success('Profile Updated successfully..'));
+            window.location.reload();
         } catch (err) {
             message.error(err.message);
         }
-        // console.log('Received values of form: ', e);
-        // console.log(props.user);
         setVisibleNewEvent(false);
     };
 
     const onNewEventFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
+        message.error(errorInfo.message).then(r => {});
     };
     const handleCancelNewEvent = (e) => {
         console.log(e);
@@ -128,32 +95,13 @@ export default function Event(props) {
     const [currUser, setCurrUser] = useState([]);
 
     useEffect(() => {
-        const fetchEvents = async () => {
-            const res = await axios.get(process.env.API_URL + "api/user/" + user._id);
+        const fetchUser = async () => {
+            const res = await axios.get("https://haveme-api.herokuapp.com/api/user/" + user._id);
             setCurrUser(res.data);
-            setData(res.data);
         };
-        fetchEvents().then(r => console.log(r));
+        fetchUser().then(r => console.log(r));
     }, [user._id]);
 
-    // const [fields, setFields] = useState([
-    //     {
-    //         name: ['name'],
-    //         value: _name,
-    //     },
-    //     {
-    //         name: ['mobile'],
-    //         value: 'currUser.mobile_number',
-    //     },
-    //     {
-    //         name: ['gender'],
-    //         value: currUser.gender,
-    //     },
-    //     {
-    //         name: ['dob'],
-    //         value: currUser.dob,
-    //     },
-    // ]);
     return (
 
         <>
@@ -166,9 +114,6 @@ export default function Event(props) {
                     padding: 0,
                 }}
             >
-                {/*<div className={"ant-avatar right"}>*/}
-                {/*    <img src={currUser.avtar}/>*/}
-                {/*</div>*/}
                 <h1>Profile: {currUser.name}</h1>
 
             </Header>
@@ -181,11 +126,12 @@ export default function Event(props) {
 
                     <Card>
                         <Row>
-                            <Col
-                            >
-                                <div className={""}
-                                >
-                                    <img src={currUser.avtar} alt={currUser.avtar}/>
+                            <Col>
+                                <div>
+                                    <img style={{
+                                        width: "200px",
+                                        height: "200px",
+                                    }} src={currUser.avtar} alt={currUser.avtar}/>
                                 </div>
                             </Col>
                             <Col>
@@ -231,7 +177,7 @@ export default function Event(props) {
             </Affix>
 
 
-            {/*---------------------------- new event modal ----------------------------*/}
+            {/*---------------------------- edit profile modal ----------------------------*/}
             <Modal
                 footer={null}
                 title={
@@ -305,7 +251,7 @@ export default function Event(props) {
                         <InputNumber
                             style={{
                                 width: "100%"
-                            }} placeholder="mobile number *"  allowClear/>
+                            }} placeholder="mobile number *" allowClear/>
                     </Form.Item>
 
                     <Form.Item
@@ -355,41 +301,20 @@ export default function Event(props) {
                         />
                     </Form.Item>
 
-                    {/*<Form.Item*/}
-                    {/*    name="password"*/}
-                    {/*    rules={[*/}
-                    {/*        {*/}
-                    {/*            min: 6,*/}
-                    {/*            message: 'Password should be least 6!',*/}
-                    {/*        },*/}
-                    {/*    ]}*/}
-                    {/*    hasFeedback*/}
-                    {/*>*/}
-                    {/*    <Input.Password*/}
-                    {/*        placeholder={"Password(optional)"}*/}
-                    {/*        allowClear/>*/}
-                    {/*</Form.Item>*/}
-
-                    {/*<Form.Item*/}
-                    {/*    name="confirm"*/}
-                    {/*    dependencies={['password']}*/}
-                    {/*    hasFeedback*/}
-                    {/*    rules={[*/}
-                    {/*        ({ getFieldValue }) => ({*/}
-                    {/*            validator(_, value) {*/}
-                    {/*                if (!value || getFieldValue('password') === value) {*/}
-                    {/*                    return Promise.resolve();*/}
-                    {/*                }*/}
-
-                    {/*                return Promise.reject(new Error('The two passwords that you entered do not match!'));*/}
-                    {/*            },*/}
-                    {/*        }),*/}
-                    {/*    ]}*/}
-                    {/*>*/}
-                    {/*    <Input.Password*/}
-                    {/*        placeholder={"Confirm password(optional)"}*/}
-                    {/*        allowClear/>*/}
-                    {/*</Form.Item>*/}
+                    <Form.Item
+                        name="password"
+                        rules={[
+                            {
+                                min: 6,
+                                message: 'Password should be least 6!',
+                            },
+                        ]}
+                        hasFeedback
+                    >
+                        <Input.Password
+                            placeholder={"Password(optional)"}
+                            allowClear/>
+                    </Form.Item>
 
                     <Form.Item>
                         <Button type="primary" htmlType="submit">
@@ -398,7 +323,7 @@ export default function Event(props) {
                     </Form.Item>
                 </Form>
             </Modal>
-            {/*---------------------------- end new event modal ----------------------------*/}
+            {/*---------------------------- end edit profile modal ----------------------------*/}
 
         </>
     );
