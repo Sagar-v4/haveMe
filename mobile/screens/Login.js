@@ -4,17 +4,20 @@ import {
     StyleSheet,
     Image,
     Text,
-    TextInput,
     Alert,
 } from 'react-native';
+import {Stack, TextInput, IconButton, Button} from "@react-native-material/core";
 import CustomButton from '../components/CustomButton';
 import Home from './Home';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from "axios";
+import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 
 export default function Login({ navigation }) {
 
-    const [name, setName] = useState('');
-    const [age, setAge] = useState('');
+    // AsyncStorage.removeItem('UserData').then(r => )
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
     useEffect(() => {
         getData();
@@ -34,15 +37,16 @@ export default function Login({ navigation }) {
     }
 
     const setData = async () => {
-        if (name.length === 0 || age.length === 0) {
-            Alert.alert('Warning!', 'Please write your data.')
+        if (email.length === 0 || password.length === 0) {
+            Alert.alert('Warning!', 'Empty field not allowed!.')
         } else {
             try {
                 const user = {
-                    Name: name,
-                    Age: age
+                    "email": email,
+                    "password": password
                 }
-                await AsyncStorage.setItem('UserData', JSON.stringify(user));
+                const res = await axios.post("https://haveme-api.herokuapp.com/api/auth/login", user);
+                await AsyncStorage.setItem('UserData', JSON.stringify(res.data));
                 navigation.navigate("Home");
             } catch (error) {
                 console.log(error);
@@ -57,24 +61,29 @@ export default function Login({ navigation }) {
             {/*    source={require('../../assets/asyncstorage.png')}*/}
             {/*/>*/}
             <Text style={styles.text}>
-                Welcome to haveMe
+                {/*Welcome to haveMe*/}
             </Text>
             <TextInput
-                style={styles.input}
-                placeholder='Email'
-                onChangeText={(value) => setName(value)}
+                placeholder="Email" style={styles.input}
+                onChangeText={(value) => setEmail(value)}
             />
+            {/*<TextInput*/}
+            {/*    style={styles.input}*/}
+            {/*    placeholder='Email'*/}
+            {/*    onChangeText={(value) => setEmail(value)}*/}
+            {/*/>*/}
             <TextInput
                 secureTextEntry
                 style={styles.input}
                 placeholder='Password'
-                onChangeText={(value) => setAge(value)}
+                onChangeText={(value) => setPassword(value)}
             />
-            <CustomButton
-                title='Login'
-                color='#1eb900'
-                onPressFunction={setData}
-            />
+            <Button title={"Login"} onPress={setData} />
+            {/*<CustomButton*/}
+            {/*    title='Login'*/}
+            {/*    color='#1eb900'*/}
+            {/*    onPressFunction={setData}*/}
+            {/*/>*/}
         </View>
     )
 }
@@ -83,7 +92,7 @@ const styles = StyleSheet.create({
     body: {
         flex: 1,
         alignItems: 'center',
-        backgroundColor: '#0080ff',
+        // backgroundColor: '#0080ff',
     },
     logo: {
         width: 100,

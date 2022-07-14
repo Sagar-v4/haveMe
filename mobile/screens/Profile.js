@@ -10,11 +10,23 @@ import {
 
 import axios from "axios";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {Button} from "@react-native-material/core";
 
-export default function Profile({ navigation }) {
+export default function Profile({navigation}) {
+
+
+    const removeData = async () => {
+        try {
+            await AsyncStorage.clear();
+            navigation.navigate('Login');
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     const user = {
-        _id: "62a84917600df42f43fe2614",
+        _id: "62c5a97fce60b5e215118764",
     }
 
     const [profile, setProfile] = useState([]);
@@ -35,13 +47,13 @@ export default function Profile({ navigation }) {
                 <View style={{flexDirection: 'row', marginTop: 15}}>
                     <Avatar.Image
                         source={{
-                            uri: 'https://cdn.pixabay.com/photo/2013/07/13/12/07/avatar-159236_960_720.png',
+                            uri: profile.avtar,
                         }}
                         size={80}
                     />
                     <View style={{marginLeft: 20}}>
                         <Title style={[styles.title, {
-                            marginTop:15,
+                            marginTop: 15,
                             marginBottom: 5,
                         }]}>{profile.name}</Title>
                         {/*<Caption style={styles.caption}>{profile.email}</Caption>*/}
@@ -52,20 +64,22 @@ export default function Profile({ navigation }) {
             <View style={styles.userInfoSection}>
                 <View style={styles.row}>
                     <Icon name="gender-male-female" color="#777777" size={20}/>
-                    <Text style={{color:"#777777", marginLeft: 20}}>{profile.gender}</Text>
+                    <Text style={{color: "#777777", marginLeft: 20}}>{profile.gender}</Text>
                 </View>
                 <View style={styles.row}>
                     <Icon name="phone" color="#777777" size={20}/>
-                    <Text style={{color:"#777777", marginLeft: 20}}>{profile.mobile_number}</Text>
+                    <Text style={{color: "#777777", marginLeft: 20}}>{profile.mobile_number}</Text>
                 </View>
                 <View style={styles.row}>
                     <Icon name="email" color="#777777" size={20}/>
-                    <Text style={{color:"#777777", marginLeft: 20}}>{profile.email}</Text>
+                    <Text style={{color: "#777777", marginLeft: 20}}>{profile.email}</Text>
                 </View>
                 <View style={styles.row}>
                     <Icon name="calendar" color="#777777" size={20}/>
-                    <Text style={{color:"#777777", marginLeft: 20}}>{profile.dob}</Text>
+                    <Text style={{color: "#777777", marginLeft: 20}}>{profile.dob}</Text>
                 </View>
+
+                <Button title={"Logout"} onPress={removeData} />
             </View>
 
         </SafeAreaView>

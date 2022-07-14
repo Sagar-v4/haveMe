@@ -5,12 +5,12 @@ import { createStackNavigator } from '@react-navigation/stack';
 import 'react-native-gesture-handler';
 import Home from './screens/Home';
 import Login from './screens/Login';
+import {Button} from "react-native";
 
 const Stack = createStackNavigator();
 
 function App() {
 
-    const [screenName, setScreenName] = useState("Home");
 
     return (
 
@@ -20,9 +20,9 @@ function App() {
                 screenOptions={{
                     headerTitleAlign: 'center',
                     headerStyle: {
-                        backgroundColor: '#0080ff'
+                        // backgroundColor: '#0080ff'
                     },
-                    headerTintColor: '#ffffff',
+                    // headerTintColor: '#000000',
                     headerTitleStyle: {
                         fontSize: 25,
                         fontWeight: 'bold'
@@ -32,16 +32,25 @@ function App() {
                 <Stack.Screen
                     name="Login"
                     component={Login}
+
                     options={{
-                        headerShown: false,
+                        // headerShown: false,
                     }}
                 />
 
                 <Stack.Screen
-                    name={screenName}
-                    screenName ={screenName}
-                    setScreenName={setScreenName}
+                    name={"Home"}
                     component={Home}
+                    // options={{
+                    //     headerRight: () => (
+                    //         <Button
+                    //             onPress={() => alert('This is a button!')}
+                    //             title="Info"
+                    //             color="#0080ff"
+                    //         />
+                    //     ),
+                    // }}
+                    options={{headerShown: false}}
                 />
             </Stack.Navigator>
         </NavigationContainer>

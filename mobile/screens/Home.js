@@ -11,66 +11,20 @@ import {
     StyleSheet,
     View,
     Text,
+    Button,
     Alert,
     TextInput,
 } from 'react-native';
 import CustomButton from '../components/CustomButton';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Icon} from "@react-native-material/core";
 
 const Tab = createBottomTabNavigator();
 // const Tab = createMaterialBottomTabNavigator();
 // const Tab = createMaterialTopTabNavigator();
 
-function Home({ navigation, route, screenName }) {
-
-
-    const [name, setName] = useState('');
-    const [age, setAge] = useState('');
-
-    useEffect(() => {
-        getData();
-    }, []);
-
-    const getData = () => {
-        try {
-            AsyncStorage.getItem('UserData')
-                .then(value => {
-                    if (value != null) {
-                        let user = JSON.parse(value);
-                        setName(user.Name);
-                        setAge(user.Age);
-                    }
-                })
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    const updateData = async () => {
-        if (name.length === 0) {
-            Alert.alert('Warning!', 'Please write your data.')
-        } else {
-            try {
-                const user = {
-                    Name: name
-                };
-                await AsyncStorage.mergeItem('UserData', JSON.stringify(user));
-                Alert.alert('Success!', 'Your data has been updated.');
-            } catch (error) {
-                console.log(error);
-            }
-        }
-    }
-
-    const removeData = async () => {
-        try {
-            await AsyncStorage.clear();
-            navigation.navigate('Login');
-        } catch (error) {
-            console.log(error);
-        }
-    }
+function Home({ navigation, route, screenName}) {
 
 
     return (
@@ -81,16 +35,16 @@ function Home({ navigation, route, screenName }) {
                         let iconName;
                         if (route.name === 'Profile') {
                             iconName = 'user';
-                            size = focused ? 25 : 20;
-                            // color = focused ? '#f0f' : '#555';
+                            // size = focused ? 30 : 20;
+                            color = focused ? '#6200ee' : '#555';
                         } else if (route.name === 'History') {
                             iconName = 'history';
-                            size = focused ? 25 : 20;
-                            // color = focused ? '#f0f' : '#555';
+                            // size = focused ? 30 : 20;
+                            color = focused ? '#6200ee' : '#555';
                         } else if (route.name === 'Scan') {
                             iconName = 'expand';
-                            size = focused ? 25 : 20;
-                            // color = focused ? '#f0f' : '#555';
+                            // size = focused ? 30 : 20;
+                            color = focused ? '#6200ee' : '#555';
                         }
                         return (
                             <FontAwesome5
@@ -101,42 +55,27 @@ function Home({ navigation, route, screenName }) {
                         )
                     }
                 })}
-                tabBarOptions={{
-                    tabBarActiveTintColor: '#f0f',
-                    tabBarInactiveTintColor: '#555',
-                    tabBarActiveBackgroundColor: '#fff',
-                    tabBarInactiveBackgroundColor: '#999',
-                    tabBarShowLabel: true,
-                    tabBarLabelStyle: { fontSize: 14 },
-                    tabBarShowIcon: true,
-                    tabBarStyle: [
-                        {
-                            display: "flex"
-                        },
-                        null
-                    ]
-                }}
-                activeColor='#f0edf6'
-                inactiveColor='#3e2465'
-                barStyle={{ backgroundColor: '#694fad' }}
             >
                 <Tab.Screen
                     name={"History"}
                     component={History}
+                    options={{ tabBarShowLabel: false }}
+
                 />
                 <Tab.Screen
-
                     name="Scan"
                     component={Scan}
+                    options={{ tabBarShowLabel: false }}
                 />
                 <Tab.Screen
                     name="Profile"
                     component={Profile}
-                    // options={{ tabBarBadge: 3 }}
+                    options={{ tabBarShowLabel: false }}
                 />
             </Tab.Navigator>
         // </NavigationContainer>
     )
 }
+
 
 export default Home;
