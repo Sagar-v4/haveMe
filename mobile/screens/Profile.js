@@ -1,20 +1,16 @@
 import React, {useEffect, useState} from 'react';
-import {View, SafeAreaView, StyleSheet} from 'react-native';
-import {
-    Avatar,
-    Title,
-    Caption,
-    Text,
-    TouchableRipple,
-} from 'react-native-paper';
-
+import { View, SafeAreaView, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { Avatar, Title, Text, } from 'react-native-paper';
 import axios from "axios";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {Button} from "@react-native-material/core";
+import { Button } from "@react-native-material/core";
+
+const wait = (timeout) => {
+    return new Promise(resolve => setTimeout(resolve, timeout));
+}
 
 export default function Profile({navigation}) {
-
 
     const removeData = async () => {
         try {
@@ -25,64 +21,92 @@ export default function Profile({navigation}) {
         }
     }
 
-    const user = {
-        _id: "62c5a97fce60b5e215118764",
-    }
+    let user = AsyncStorage.getItem('UserData')
 
     const [profile, setProfile] = useState([]);
+    const fetchUser = async () => {
+        user = JSON.parse(await user);
+        const res = await axios.get("https://haveme-api.herokuapp.com/api/user/" + user);
+        setProfile(res.data);
+    };
+
+    const [refreshing, setRefreshing] = React.useState(false);
+
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        fetchUser().then(setRefreshing(false));
+        wait(2000).then(() => setRefreshing(false));
+    }, []);
 
     useEffect(() => {
-        const fetchUser = async () => {
-            const res = await axios.get("https://haveme-api.herokuapp.com/api/user/" + user._id);
-            setProfile(res.data);
-        };
         fetchUser().then(r => console.log(r));
-    }, [user._id]);
-
+    }, []);
 
     return (
-        <SafeAreaView style={styles.container}>
 
-            <View style={styles.userInfoSection}>
-                <View style={{flexDirection: 'row', marginTop: 15}}>
-                    <Avatar.Image
-                        source={{
-                            uri: profile.avtar,
-                        }}
-                        size={80}
+        <SafeAreaView style={styles.container}>
+            <ScrollView
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
                     />
-                    <View style={{marginLeft: 20}}>
-                        <Title style={[styles.title, {
-                            marginTop: 15,
-                            marginBottom: 5,
-                        }]}>{profile.name}</Title>
-                        {/*<Caption style={styles.caption}>{profile.email}</Caption>*/}
+                }
+            >
+
+                <View style={styles.userInfoSection}>
+                    <View style={{flexDirection: 'row', marginTop: 15}}>
+                        <Avatar.Image
+                            source={{
+                                uri: profile.avtar,
+                            }}
+                            size={80}
+                        />
+                        <View style={{marginLeft: 20}}>
+                            <Title style={[styles.title, {
+                                marginTop: 15,
+                                marginBottom: 5,
+                            }]}>{profile.name}</Title>
+                        </View>
                     </View>
                 </View>
-            </View>
 
-            <View style={styles.userInfoSection}>
-                <View style={styles.row}>
-                    <Icon name="gender-male-female" color="#777777" size={20}/>
-                    <Text style={{color: "#777777", marginLeft: 20}}>{profile.gender}</Text>
-                </View>
-                <View style={styles.row}>
-                    <Icon name="phone" color="#777777" size={20}/>
-                    <Text style={{color: "#777777", marginLeft: 20}}>{profile.mobile_number}</Text>
-                </View>
-                <View style={styles.row}>
-                    <Icon name="email" color="#777777" size={20}/>
-                    <Text style={{color: "#777777", marginLeft: 20}}>{profile.email}</Text>
-                </View>
-                <View style={styles.row}>
-                    <Icon name="calendar" color="#777777" size={20}/>
-                    <Text style={{color: "#777777", marginLeft: 20}}>{profile.dob}</Text>
-                </View>
+                <View style={styles.userInfoSection}>
+                    <View style={styles.row}>
+                        <Icon name="gender-male-female" color="#777777" size={20}/>
+                        <Text style={{color: "#777777", marginLeft: 20}}>{profile.gender}</Text>
+                    </View>
+                    <View style={styles.row}>
+                        <Icon name="phone" color="#777777" size={20}/>
+                        <Text style={{color: "#777777", marginLeft: 20}}>{profile.mobile_number}</Text>
+                    </View>
+                    <View style={styles.row}>
+                        <Icon name="email" color="#777777" size={20}/>
+                        <Text style={{color: "#777777", marginLeft: 20}}>{profile.email}</Text>
+                    </View>
+                    <View style={styles.row}>
+                        <Icon name="calendar" color="#777777" size={20}/>
+                        <Text style={{color: "#777777", marginLeft: 20}}>{profile.dob}</Text>
+                    </View>
 
-                <Button title={"Logout"} onPress={removeData} />
-            </View>
 
+                    <View style={styles.row}>
+
+                        <Button title={"Logout"} style={{
+                            marginRight: "5%",
+                            width: "45%"
+                        }} onPress={removeData}/>
+
+                        <Button title={"Edit"} style={{
+                            marginLeft: "5%",
+                            width: "45%"
+                        }}/>
+
+                    </View>
+                </View>
+            </ScrollView>
         </SafeAreaView>
+
     );
 };
 
@@ -98,41 +122,8 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
     },
-    caption: {
-        fontSize: 14,
-        lineHeight: 14,
-        fontWeight: '500',
-    },
     row: {
         flexDirection: 'row',
         marginBottom: 10,
-    },
-    infoBoxWrapper: {
-        borderBottomColor: '#dddddd',
-        borderBottomWidth: 1,
-        borderTopColor: '#dddddd',
-        borderTopWidth: 1,
-        flexDirection: 'row',
-        height: 100,
-    },
-    infoBox: {
-        width: '50%',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    menuWrapper: {
-        marginTop: 10,
-    },
-    menuItem: {
-        flexDirection: 'row',
-        paddingVertical: 15,
-        paddingHorizontal: 30,
-    },
-    menuItemText: {
-        color: '#777777',
-        marginLeft: 20,
-        fontWeight: '600',
-        fontSize: 16,
-        lineHeight: 26,
     },
 });

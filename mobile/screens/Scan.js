@@ -6,9 +6,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Scan({ navigation }) {
 
-    const user = {
-        _id: "62c5a97fce60b5e215118764",
-    }
+    let user = AsyncStorage.getItem('UserData')
+
     const [hasPermission, setHasPermission] = useState(null);
     const [scanned, setScanned] = useState(false);
     const [showBox, setShowBox] = useState(true);
@@ -17,7 +16,7 @@ export default function Scan({ navigation }) {
     const [event, setEvent] = useState({});
 
     const showConfirmDialog = async () => {
-        // setEvent(evt);
+        user = JSON.parse(await user);
         return Alert.alert(
             "Are your sure?",
             event.name,
@@ -29,7 +28,7 @@ export default function Scan({ navigation }) {
                         try {
                             const res = await axios.post("https://haveme-api.herokuapp.com/api/presence/", {
                                 "event_id": event._id,
-                                "user_id": user._id,
+                                "user_id": user,
                             });
                             ToastAndroid.show('Request successful!', ToastAndroid.LONG);
                         } catch (e) {
@@ -40,8 +39,6 @@ export default function Scan({ navigation }) {
                         }
                     },
                 },
-                // The "No" button
-                // Does nothing but dismiss the dialog when tapped
                 {
                     text: "No",
                 },
@@ -61,16 +58,16 @@ export default function Scan({ navigation }) {
         // setScanned(true);
         setEvent(null);
         try {
-                const res = await axios.get("https://haveme-api.herokuapp.com/api/event/" + QR + "/qr");
-                // res.data.map(r => {
-                //     r.key = r._id;
-                //     r.name = r.event_id.name;
-                //     r.description = r.event_id.description;
-                // });
+            const res = await axios.get("https://haveme-api.herokuapp.com/api/event/" + QR + "/qr");
+            // res.data.map(r => {
+            //     r.key = r._id;
+            //     r.name = r.event_id.name;
+            //     r.description = r.event_id.description;
+            // });
 
-                // ToastAndroid.show(`EVENT: ${res}`, ToastAndroid.LONG);
-                setEvent(res.data);
-                await showConfirmDialog();
+            // ToastAndroid.show(`EVENT: ${res}`, ToastAndroid.LONG);
+            setEvent(res.data);
+            await showConfirmDialog();
             // }
 
         } catch (e) {
@@ -85,11 +82,11 @@ export default function Scan({ navigation }) {
 
     const handleBarCodeScanned = async ({type, data}) => {
         // if(data !== QR) {
-            setQR(data);
-            setScanned(true);
-            await findQR().then(r => setScanned(event !== null));
-            // ToastAndroid.show('Request cancelled!', ToastAndroid.SHORT);
-            // alert(`Bar code with type ${type} and data ${data} has been scanned!\n Event Details:${event}`);
+        setQR(data);
+        setScanned(true);
+        await findQR().then(r => setScanned(event !== null));
+        // ToastAndroid.show('Request cancelled!', ToastAndroid.SHORT);
+        // alert(`Bar code with type ${type} and data ${data} has been scanned!\n Event Details:${event}`);
         // }
     };
 
@@ -110,7 +107,7 @@ export default function Scan({ navigation }) {
 
                 // setQR(null);
                 setScanned(false)
-            }} />}
+            }}/>}
         </View>
 
         // <View style={styles.screen}>
