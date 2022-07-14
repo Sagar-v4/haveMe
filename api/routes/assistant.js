@@ -1,4 +1,6 @@
-const {getAssistant, getAssistants, createAssistant, updateAssistant, getEventAssistant, deleteAssistant} = require("../controllers/assistant");
+const {getAssistant, getAssistants, createAssistant, updateAssistant, getEventAssistant, deleteAssistant,
+    getAllUserAssist
+} = require("../controllers/assistant");
 const {createEvent} = require("../controllers/event");
 const router = require("express").Router();
 
@@ -25,5 +27,8 @@ router.get("/:id/event", getEventAssistant);
 
 // GET ALL
 router.get("/:id/all", getAssistants);
+
+// GET ALL EVENTS OF USER
+router.get("/:id/allEvents", getAllUserAssist);
 
 module.exports = router;

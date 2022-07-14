@@ -122,9 +122,6 @@ const getAssistant = async (req, res) => {
 
         try {
             let assist = await Assistant.find({user_id : req.params.id});
-
-
-
             console.log(assist);
 
             // const {password, ...otherDetails} = user._doc;
@@ -163,6 +160,44 @@ const getEventAssistant = async (req, res) => {
         }
     } else {
         res.status(403).json("You are not allow to get!");
+    }
+}
+
+// GET ALL
+const getAllUserAssist = async (req, res) => {
+
+    const user = await User.findOne({ _id: req.params.id} );
+
+    if(!user) return res.status(404).json("User not found");
+    if(!user.status) return res.status(401).json("User not authorised!");
+
+    if (user._id.equals(req.params.id) || user._type === Users.Admin ) {
+
+        try {
+            const userProjection = {
+                "_id": 1,
+                "dob" : 1,
+                "name": 1,
+                "email": 1,
+                "_type": 1,
+                "avtar": 1,
+                "status": 1,
+                "gender" : 1,
+                "createdAt": 1,
+                "mobile_number" : 1,
+                "email_verified" : 1,
+            };
+
+            const events = await Assistant.find({"user_id": user._id})
+                .populate("event_id");
+            console.log(events)
+            return res.status(200).json(events);
+
+        } catch (err) {
+            res.status(500).json(err);
+        }
+    } else {
+        res.status(403).json("You are not allowed!");
     }
 }
 
@@ -209,4 +244,5 @@ module.exports = {
     getEventAssistant,
     getAssistant,
     getAssistants,
+    getAllUserAssist,
 }

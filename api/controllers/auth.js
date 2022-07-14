@@ -21,7 +21,10 @@ const register = async (req, res) => {
 
         // USER SAVE & RESPONSE
         await newUser.save();
-        res.status(201).json("User created!");
+
+        const usr = await User.findOne({ email: newUser.email} );
+        const {password, ...otherDetails} = usr._doc;
+        res.status(200).json({...otherDetails});
         // res.status(201).json("User created!");
 
     } catch (err) {

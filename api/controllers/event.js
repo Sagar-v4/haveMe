@@ -151,6 +151,19 @@ const getEvent = async (req, res) => {
     }
 }
 
+// GET
+const getEventQR = async (req, res) => {
+
+    const event = await Event.findOne({code: req.params.id});
+    if (!event) return res.status(404).json("Event not found!");
+
+    try {
+        res.status(200).json(event._doc);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+}
+
 // GET ALL user
 const getUserEvents = async (req, res) => {
 
@@ -224,5 +237,6 @@ module.exports = {
     getEvent,
     getUserEvents,
     getEvents,
+    getEventQR,
     updateEventQR,
 }

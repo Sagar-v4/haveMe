@@ -137,6 +137,7 @@ const getUserPresences = async (req, res) => {
         console.log("here");
         const presences = await Presence.find({user_id: req.params.id}).populate("event_id");
             // .populate("selected").populate("selection_id");
+        console.log(presences);
         res.status(200).json(presences);
     } catch (err) {
         res.status(500).json(err);

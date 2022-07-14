@@ -1,6 +1,6 @@
 
 const router = require("express").Router();
-const {createEvent, updateEvent, getEvent, getEvents, deleteEvent, getUserEvents, updateEventQR, } = require("../controllers/event");
+const {createEvent, updateEvent, getEvent, getEvents, deleteEvent, getUserEvents, updateEventQR, getEventQR, } = require("../controllers/event");
 
 // TEST
 router.get("/", (req, res) => {
@@ -21,6 +21,9 @@ router.delete("/:id", deleteEvent);
 
 // GET
 router.get("/:id", getEvent);
+
+// GET
+router.get("/:id/qr", getEventQR);
 
 // GET ALL user
 router.get("/:id/user", getUserEvents);

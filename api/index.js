@@ -1,11 +1,10 @@
 
 const express = require("express");
 const conn = require("./config/db");
-const dotenv = require("dotenv");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const app = express();
-dotenv.config();
+require("./passport");
 
 // Routes
 const authRoute = require("./routes/auth");
@@ -29,12 +28,16 @@ app.use(express.json());
 app.use(helmet());
 app.use(morgan("common"));
 
-
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
 app.use("/api/event", eventRoute);
 app.use("/api/presence", presenceRoute);
 app.use("/api/assistant", assistantRoute);
+
+
+app.use("/", (req, res) => {
+    res.send("main haveMe-api");
+});
 
 
 
