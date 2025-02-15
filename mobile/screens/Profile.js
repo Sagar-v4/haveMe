@@ -26,7 +26,7 @@ export default function Profile({navigation}) {
     const [profile, setProfile] = useState([]);
     const fetchUser = async () => {
         user = JSON.parse(await user);
-        const res = await axios.get("https://haveme-api.herokuapp.com/api/user/" + user);
+        const res = await axios.get(process.env.API_URL + "/api/user/" + user);
         setProfile(res.data);
     };
 

@@ -20,7 +20,7 @@ export default function Login() {
     const handleClick = async (e) => {
 
         try {
-            const res = await axios.post("https://haveme-api.herokuapp.com/api/auth/login/", {
+            const res = await axios.post(process.env.API_URL + "/api/auth/login/", {
                 email: e.email,
                 password: e.password
             });

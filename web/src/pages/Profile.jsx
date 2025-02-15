@@ -57,7 +57,7 @@ export default function Profile() {
         }
 
         try {
-            await axios.put("https://haveme-api.herokuapp.com/api/user/" + user._id, editUser)
+            await axios.put(process.env.API_URL + "/api/user/" + user._id, editUser)
                 .then(message.success('Profile Updated successfully..'));
             window.location.reload();
         } catch (err) {
@@ -96,7 +96,7 @@ export default function Profile() {
 
     useEffect(() => {
         const fetchUser = async () => {
-            const res = await axios.get("https://haveme-api.herokuapp.com/api/user/" + user._id);
+            const res = await axios.get(process.env.API_URL + "/api/user/" + user._id);
             setCurrUser(res.data);
         };
         fetchUser().then(r => console.log(r));

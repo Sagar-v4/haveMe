@@ -36,7 +36,7 @@ export default function Login({ navigation }) {
                     "email": email,
                     "password": password
                 }
-                const res = await axios.post("https://haveme-api.herokuapp.com/api/auth/login", user);
+                const res = await axios.post(process.env.API_URL + "/api/auth/login", user);
                 await AsyncStorage.setItem('UserData', JSON.stringify(res.data._id));
                 navigation.navigate("Home");
             } catch (error) {

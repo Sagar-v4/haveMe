@@ -279,7 +279,7 @@ export default function Assist(props) {
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const res = await axios.get("https://haveme-api.herokuapp.com/api/assistant/" + user._id + "/allEvents");
+                const res = await axios.get(process.env.API_URL + "/api/assistant/" + user._id + "/allEvents");
 
                 setEvents(res.data.sort((e1, e2) => {
                     return new Date(e1.expire) - new Date(e2.expire);
@@ -297,7 +297,7 @@ export default function Assist(props) {
     useEffect(() => {
         const fetchPresences = async () => {
             try {
-                const presence = await axios.get("https://haveme-api.herokuapp.com/api/presence/" + eventId + "/event");
+                const presence = await axios.get("process.env.API_URL/api/presence/" + eventId + "/event");
                 presence.data.map(r => {
                     r.name = r.user_id.name;
                     r.email = r.user_id.email;
@@ -314,7 +314,7 @@ export default function Assist(props) {
     useEffect(() => {
         const fetchQR = async () => {
             try {
-                const res = await axios.put("https://haveme-api.herokuapp.com/api/event/" + currEvent._id + "/qr", {user_id: user._id});
+                const res = await axios.put("process.env.API_URL/api/event/" + currEvent._id + "/qr", {user_id: user._id});
                 setCurrEvent(res.data);
                 setQRcode(res.data.code);
             } catch (err) {
@@ -328,7 +328,7 @@ export default function Assist(props) {
     useEffect(() => {
         const fetchAllUsers = async () => {
             try {
-                const users = await axios.get("https://haveme-api.herokuapp.com/api/user/" + user._id + "/all");
+                const users = await axios.get("process.env.API_URL/api/user/" + user._id + "/all");
                 setAllUsers(users.data);
             } catch (err) {
                 // message.error(err.message);
@@ -341,7 +341,7 @@ export default function Assist(props) {
     useEffect(() => {
         const setNewPresence = async () => {
             try {
-                const p = await axios.post("https://haveme-api.herokuapp.com/api/presence", {
+                const p = await axios.post("process.env.API_URL/api/presence", {
                     "event_id": eventId,
                     "user_id": newPresence,
                 });
@@ -361,8 +361,8 @@ export default function Assist(props) {
     useEffect(() => {
         const updatePresence = async () => {
             try {
-                await axios.put("https://haveme-api.herokuapp.com/api/presence/" + updPresence);
-                const presence = await axios.get("https://haveme-api.herokuapp.com/api/presence/" + eventId + "/event");
+                await axios.put("process.env.API_URL/api/presence/" + updPresence);
+                const presence = await axios.get("process.env.API_URL/api/presence/" + eventId + "/event");
                 presence.data.map(r => {
                     r.name = r.user_id.name;
                     r.email = r.user_id.email;

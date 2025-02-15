@@ -26,7 +26,7 @@ export default function History({navigation}) {
 
     const fetchPresence = async () => {
         user = JSON.parse(await user);
-        const res = await axios.get("https://haveme-api.herokuapp.com/api/presence/" + user + "/user");
+        const res = await axios.get(process.env.API_URL + "/api/presence/" + user + "/user");
         res.data.map(r => {
             r.key = r._id;
             r.name = r.event_id.name;

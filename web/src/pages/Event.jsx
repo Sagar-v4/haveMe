@@ -96,7 +96,7 @@ export default function Event() {
         }
 
         try {
-            await axios.post("https://haveme-api.herokuapp.com/api/event", newEvent)
+            await axios.post(process.env.API_URL + "/api/event", newEvent)
                 .then(message.success('Event created..'));
             window.location.reload();
 
@@ -161,7 +161,7 @@ export default function Event() {
         }
 
         try {
-            await axios.put("https://haveme-api.herokuapp.com/api/event/" + currEvent._id, EditEvent)
+            await axios.put(process.env.API_URL + "/api/event/" + currEvent._id, EditEvent)
                 .then(message.success('Event Updated..'));
             window.location.reload();
 
@@ -616,7 +616,7 @@ export default function Event() {
         const fetchEvents = async () => {
 
             try {
-                const res = await axios.get("https://haveme-api.herokuapp.com/api/event/" + user._id + "/user");
+                const res = await axios.get(process.env.API_URL + "/api/event/" + user._id + "/user");
                 setEvents(res.data.sort((e1, e2) => {
                     return new Date(e1.expire) - new Date(e2.expire);
                 }));
@@ -631,7 +631,7 @@ export default function Event() {
     useEffect(() => {
         const fetchPresences = async () => {
             try {
-                const presence = await axios.get("https://haveme-api.herokuapp.com/api/presence/" + eventId + "/event");
+                const presence = await axios.get(process.env.API_URL + "/api/presence/" + eventId + "/event");
                 presence.data.map(r => {
                     r.name = r.user_id.name;
                     r.email = r.user_id.email;
@@ -648,7 +648,7 @@ export default function Event() {
     useEffect(() => {
         const fetchQR = async () => {
             try {
-                const res = await axios.put("https://haveme-api.herokuapp.com/api/event/" + currEvent._id + "/qr", {user_id: user._id});
+                const res = await axios.put(process.env.API_URL + "/api/event/" + currEvent._id + "/qr", {user_id: user._id});
                 setCurrEvent(res.data);
                 setQRcode(res.data.code);
             } catch (err) {
@@ -662,7 +662,7 @@ export default function Event() {
     useEffect(() => {
         const fetchAllUsers = async () => {
             try {
-                const users = await axios.get("https://haveme-api.herokuapp.com/api/user/" + user._id + "/all");
+                const users = await axios.get(process.env.API_URL + "/api/user/" + user._id + "/all");
                 setAllUsers(users.data);
             } catch (err) {
                 // message.error(err.message);
@@ -674,7 +674,7 @@ export default function Event() {
     useEffect(() => {
         const setNewPresence = async () => {
             try {
-                const p = await axios.post("https://haveme-api.herokuapp.com/api/presence", {
+                const p = await axios.post(process.env.API_URL + "/api/presence", {
                     "event_id": eventId,
                     "user_id": newPresence,
                 });
@@ -695,7 +695,7 @@ export default function Event() {
     useEffect(() => {
         const setNewAssist = async () => {
             try {
-                const p = await axios.post("https://haveme-api.herokuapp.com/api/assistant/", {
+                const p = await axios.post(process.env.API_URL + "/api/assistant/", {
                     "user_id" : newAssist,
                     "event_id" : eventId,
                 });
@@ -717,13 +717,13 @@ export default function Event() {
     useEffect(() => {
         const fetchAssists = async () => {
             try {
-                const presence = await axios.get("https://haveme-api.herokuapp.com/api/presence/" + eventId + "/event");
+                const presence = await axios.get(process.env.API_URL + "/api/presence/" + eventId + "/event");
                 presence.data.map(r => {
                     r.name = r.user_id.name;
                     r.email = r.user_id.email;
                 });
                 setPresences(presence.data);
-                const assist = await axios.get("https://haveme-api.herokuapp.com/api/assistant/" + eventId + "/event");
+                const assist = await axios.get(process.env.API_URL + "/api/assistant/" + eventId + "/event");
                 assist.data.map(r => {
                     r.name = r.user_id.name;
                     r.email = r.user_id.email;
@@ -740,8 +740,8 @@ export default function Event() {
     useEffect(() => {
         const deleAssist = async () => {
             try {
-                await axios.delete("https://haveme-api.herokuapp.com/api/assistant/" + delAssist);
-                const assist = await axios.get("https://haveme-api.herokuapp.com/api/assistant/" + eventId + "/event");
+                await axios.delete(process.env.API_URL + "/api/assistant/" + delAssist);
+                const assist = await axios.get(process.env.API_URL + "/api/assistant/" + eventId + "/event");
                 assist.data.map(r => {
                     r.name = r.user_id.name;
                     r.email = r.user_id.email;
@@ -759,8 +759,8 @@ export default function Event() {
     useEffect(() => {
         const updatePresence = async () => {
             try {
-                await axios.put("https://haveme-api.herokuapp.com/api/presence/" + updPresence);
-                const presence = await axios.get("https://haveme-api.herokuapp.com/api/presence/" + eventId + "/event");
+                await axios.put(process.env.API_URL + "/api/presence/" + updPresence);
+                const presence = await axios.get(process.env.API_URL + "/api/presence/" + eventId + "/event");
                 presence.data.map(r => {
                     r.name = r.user_id.name;
                     r.email = r.user_id.email;

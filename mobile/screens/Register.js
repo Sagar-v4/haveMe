@@ -23,7 +23,7 @@ export default function Register({ navigation }) {
                     "name": name,
                     "password": password
                 }
-                const res = await axios.post("https://haveme-api.herokuapp.com/api/auth/register", user);
+                const res = await axios.post(process.env.API_URL + "/api/auth/register", user);
                 await AsyncStorage.setItem('UserData', JSON.stringify(res.data._id));
                 navigation.navigate("Home");
             } catch (error) {

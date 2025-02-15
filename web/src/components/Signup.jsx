@@ -27,7 +27,7 @@ export default function Signup() {
         }
 
         try {
-            const res = await axios.post("https://haveme-api.herokuapp.com/api/auth/register", register);
+            const res = await axios.post(process.env.API_URL + "/api/auth/register", register);
             message.success('Registration successful!');
             localStorage.setItem("user", JSON.stringify(res.data));
             window.location.reload();
